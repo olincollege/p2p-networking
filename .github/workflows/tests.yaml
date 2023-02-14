@@ -1,0 +1,22 @@
+name: Build and Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  Tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install tools
+        run: sudo apt-get install gcc make cmake clang-format clang-tidy libcriterion-dev
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Build targets and tests
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make 
+      - name: Run unit tests
+        run: |
+          cd build
+          ctest --output-on-failure
