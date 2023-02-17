@@ -45,6 +45,8 @@ __VECTOR(char, char);
 __VECTOR(int, intptr);
 __VECTOR(char*, charptr);
 
+/*
+
 int main() {
     vector_int vec = new_vec_int();
     push_vec_int(&vec, 20);
@@ -56,3 +58,5 @@ int main() {
 
     puts("hello"); 
 }
+
+*/

@@ -12,3 +12,14 @@ add_test(
   NAME test_hello
   COMMAND test_hello ${CRITERION_FLAGS}
 )
+
+add_executable(test_vector test_vector.c)
+target_link_libraries(test_vector
+  PUBLIC ${CRITERION}
+)
+add_test(
+  NAME test_vector
+  COMMAND test_vector ${CRITERION_FLAGS}
+)
+
+
