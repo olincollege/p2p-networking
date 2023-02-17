@@ -1,9 +1,11 @@
 #include <stdio.h> 
-#include <string.h> 
 #include <stdlib.h> 
+#include <string.h> 
+#pragma clang diagnostic ignored "-Wstrict-prototypes"
 
-#define __VECTOR(TYPE, NAME)                                              \
-                                                                          \
+// NOLINTBEGIN -- false warnings from strict-prototypes and macro () enclosure also memcpy warning is non-relevant
+#define vector__(TYPE, NAME)                                              \
+    /* NOLINTBEGIN("bugprone-macro-parentheses") */                       \
     /* A dynamic vector of type #TYPE akin to std::vector from c++ */     \
     typedef struct vector_##NAME {                                        \
         TYPE* arr;                                                        \
@@ -23,7 +25,7 @@
         vec->size ++;                                                     \
         vec->arr[vec->size-1] = element;                                  \
     }                                                                     \
-    /* Returns a pointer to the alement at a given index in the vecotr */ \
+    /* Returns a pointer to the alement at a given index in the vector */ \
     TYPE* get_vec_##NAME(vector_##NAME* vec, size_t idx) {                \
         return &vec->arr[idx];                                            \
     }                                                                     \
@@ -37,26 +39,12 @@
         free(vec->arr);                                                   \
         vec->arr = NULL;                                                  \
     }                                                                     \
-
+    /* NOLINTEND("bugprone-macro-parentheses") */                         \
+// NOLINTEND
 
 // define common vector types we might need
-__VECTOR(int, int);
-__VECTOR(char, char);
-__VECTOR(int, intptr);
-__VECTOR(char*, charptr);
+vector__(int, int)
+vector__(char, char)
+vector__(int, intptr)
+vector__(char*, charptr)
 
-/*
-
-int main() {
-    vector_int vec = new_vec_int();
-    push_vec_int(&vec, 20);
-    push_vec_int(&vec, 4); 
-    push_vec_int(&vec, 3); 
-    push_vec_int(&vec, 8); 
-    
-    printf("%d\n", *get_vec_int(&vec, 3));
-
-    puts("hello"); 
-}
-
-*/

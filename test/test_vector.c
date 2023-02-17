@@ -3,8 +3,10 @@
 
 #include "../src/vector.h"
 
-Test(strip, empty_string) {
-
+// The magic constant warnings are useless here
+// NOLINTBEGIN
+Test(vector, vector_int) {
+    // add elements to container
     vector_int vec = new_vec_int();
     push_vec_int(&vec, 20);
     push_vec_int(&vec, 4); 
@@ -26,3 +28,4 @@ Test(strip, empty_string) {
     free_vec_int(&vec);
 
 }
+// NOLINTEND
