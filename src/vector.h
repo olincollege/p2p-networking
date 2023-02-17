@@ -5,7 +5,6 @@
 
 // NOLINTBEGIN -- false warnings from strict-prototypes and macro () enclosure also memcpy warning is non-relevant
 #define vector__(TYPE, NAME)                                              \
-    /* NOLINTBEGIN("bugprone-macro-parentheses") */                       \
     /* A dynamic vector of type #TYPE akin to std::vector from c++ */     \
     typedef struct vector_##NAME {                                        \
         TYPE* arr;                                                        \
@@ -39,7 +38,6 @@
         free(vec->arr);                                                   \
         vec->arr = NULL;                                                  \
     }                                                                     \
-    /* NOLINTEND("bugprone-macro-parentheses") */                         \
 // NOLINTEND
 
 // define common vector types we might need
