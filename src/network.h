@@ -1,5 +1,6 @@
 #include <stdio.h> 
 #include <stdlib.h> 
+#include <string.h>
 #include <fcntl.h>
 #include <arpa/inet.h> 
 #include <sys/socket.h>
@@ -34,7 +35,7 @@ enum {
     LISTEN_PORT = 8100,
     EPOLL_LISTEN_FD = 1, // mark epoll events for our socket with this code
     EPOLL_PEER_FD = 2,   // mark epoll events for peer connections with this code
-    EPOLL_TIMEOUT = -1   // mark epoll to block until event is recieved
+    EPOLL_TIMEOUT = 1000   // mark epoll to block this many ms until event is recieved
 };
 
 /* Makes a fcntl system call to mark a socket a non-blocking

@@ -51,11 +51,13 @@ void on_connection(int epoll_c, int file_descriptor) {
 // main I/O loop for the program
 void loop(int epoll_c, struct epoll_event* events) {
     int num_changes = epoll_wait(epoll_c, events, MAX_EPOLL_EVENTS, EPOLL_TIMEOUT); 
-    printf("num changes %d", num_changes);
+    printf("num changes %d\n", num_changes);
     for(size_t i = 0; i < num_changes; i++) {
         struct epoll_event epoll_e = events[i];     
-        int file_descriptor = as_custom_data(events[i].data.fd).fd;
-        int event_type = as_custom_data(events[i].data.fd).type;
+        int file_descriptor = as_custom_data(events[i].data.u64).fd;
+        int event_type = as_custom_data(events[i].data.u64).type;
+
+        printf("processing, fd: %d, et: %d \n", file_descriptor, event_type);
 
         if(epoll_e.events & EPOLLERR) {
             puts("error on epoll event");
@@ -73,6 +75,10 @@ void loop(int epoll_c, struct epoll_event* events) {
         else if(event_type == EPOLL_PEER_FD) {
             
         }
+        else {
+            puts("faillthrough");
+            exit(1);
+        }
     }
 }
 
@@ -81,7 +87,7 @@ int main() {
     struct epoll_event* events;
     events = calloc (MAX_EPOLL_EVENTS, sizeof events);
 
-    puts("running I/O loop");    
+    puts("running I/O loop.");    
     while(1) {
         loop(epoll_c, events);
     }
