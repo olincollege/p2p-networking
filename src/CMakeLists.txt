@@ -1,2 +1,2 @@
-add_library(hello hello.c hello.h vector.h)
+add_library(hello hello.c hello.h vector.h network.h)
 
