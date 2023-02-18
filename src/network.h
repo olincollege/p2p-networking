@@ -9,19 +9,23 @@
  * is a union of this type https://man7.org/linux/man-pages/man2/epoll_ctl.2.html.
  * Ideally, we want to know both the file descriptor and what the descriptor is.
  * The union is 64 bits so we can pack a 32 bit fd and a 32 bit custom user descriptor
-*/
+ */
 typedef struct epoll_custom_data {
-    int32_t fd; 
+    int32_t fd;
     int32_t type;
 } epoll_custom_data;
 
 uint64_t as_epoll_data(int32_t fd, int32_t type) {
-   epoll_custom_data event_d = {fd, type}; 
-   return *(uint64_t *) &event_d; // re-interpret cast
+    epoll_custom_data event_d = {fd, type};
+    uint64_t result;  
+    memcpy(&result, &event_d, sizeof(uint64_t));
+    return result;
 }
 epoll_custom_data as_custom_data(uint64_t epoll_data_result) {
-   return *(epoll_custom_data *) epoll_data_result; // re-interpret cast
-}
+    epoll_custom_data result = {(int)0, (int)0};
+    memcpy(&result, &epoll_data_result, sizeof(uint64_t));
+    return result;
+}   
 
 // Constants for our networking configuration
 enum {
@@ -65,7 +69,7 @@ int create_socket() {
         puts("failed to allocate socket");
         exit(1);
     }
-    
+
     // try to bind socket to port 
     int bind_res = bind(server_socket, (const struct sockaddr*) &server_adress, sizeof(server_adress));
     if(bind_res < 0) {
@@ -99,7 +103,7 @@ int create_epoll_socket() {
 
     // wrap server socket into an epoll event 
     struct epoll_event server_epoll; 
-    server_epoll.data.fd = as_epoll_data(server_socket, EPOLL_LISTEN_FD); 
+    server_epoll.data.u64 = as_epoll_data(server_socket, EPOLL_LISTEN_FD); 
 
     // https://man7.org/linux/man-pages/man7/epoll.7.html
     // mark as edge-triggering with I/O in
@@ -108,6 +112,6 @@ int create_epoll_socket() {
         puts("failed to bind socket to epoll descriptor");
         exit(1);
     }
-    
+
     return epoll_descriptor;
 }
