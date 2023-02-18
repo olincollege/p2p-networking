@@ -5,13 +5,32 @@
 #include <sys/socket.h>
 #include <sys/epoll.h>
 
+/* This is kind of a hack but basically the data from returned from an epoll event
+ * is a union of this type https://man7.org/linux/man-pages/man2/epoll_ctl.2.html.
+ * Ideally, we want to know both the file descriptor and what the descriptor is.
+ * The union is 64 bits so we can pack a 32 bit fd and a 32 bit custom user descriptor
+*/
+typedef struct epoll_custom_data {
+    int32_t fd; 
+    int32_t type;
+} epoll_custom_data;
+
+uint64_t as_epoll_data(int32_t fd, int32_t type) {
+   epoll_custom_data event_d = {fd, type}; 
+   return *(uint64_t *) &event_d; // re-interpret cast
+}
+epoll_custom_data as_custom_data(uint64_t epoll_data_result) {
+   return *(epoll_custom_data *) epoll_data_result; // re-interpret cast
+}
+
 // Constants for our networking configuration
 enum {
     MAX_EPOLL_EVENTS = 50,
     MAX_LISTEN_BACKLOG = 50,
-    LISTEN_PORT = 8201,
-    EPOLL_LISTEN_FD = 1,  // mark epoll events for our socket with this code
+    LISTEN_PORT = 8100,
+    EPOLL_LISTEN_FD = 1, // mark epoll events for our socket with this code
     EPOLL_PEER_FD = 2,   // mark epoll events for peer connections with this code
+    EPOLL_TIMEOUT = -1   // mark epoll to block until event is recieved
 };
 
 /* Makes a fcntl system call to mark a socket a non-blocking
@@ -33,11 +52,12 @@ void non_blocking_socket(int socket) {
 
 /* Creates a TCP socket and binds it to port */
 int create_socket() {
-    const struct sockaddr_in server_adress = {
+    struct sockaddr_in6 server_adress = {
         AF_INET6,                       // use ipv6 resolution
-        (sa_family_t) LISTEN_PORT,      // port to listen on  
-        inet_addr("127.0.0.1")          // listen on localhost
-    };
+        htons(LISTEN_PORT),             // port to listen on  
+        0,                              // null pad for inet_pton command
+    }; 
+    inet_pton(AF_INET6, "::1", &server_adress.sin6_addr); // listen on localhost
 
     // try to allocate a TCP socket from OS
     int server_socket = socket(AF_INET6, SOCK_STREAM, 0);
@@ -79,7 +99,7 @@ int create_epoll_socket() {
 
     // wrap server socket into an epoll event 
     struct epoll_event server_epoll; 
-    server_epoll.data.fd = EPOLL_LISTEN_FD; 
+    server_epoll.data.fd = as_epoll_data(server_socket, EPOLL_LISTEN_FD); 
 
     // https://man7.org/linux/man-pages/man7/epoll.7.html
     // mark as edge-triggering with I/O in
