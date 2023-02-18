@@ -9,7 +9,7 @@ project(SoftSysA02
 
 set(CMAKE_C_STANDARD 17)
 
-set(CMAKE_C_FLAGS "-Wall -Wextra -pedantic -Wshadow -Wconversion -Wunreachable-code -g")
+set(CMAKE_C_FLAGS "-isystem/usr/local/Cellar/criterion/2.4.1_1/include -Wall -Wextra -pedantic -Wshadow -Wconversion -Wunreachable-code -g")
 
 set(CMAKE_C_CLANG_TIDY
   clang-tidy;
