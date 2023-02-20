@@ -23,4 +23,9 @@ add_test(
   COMMAND test_vector ${CRITERION_FLAGS}
 )
 
+add_executable(loop ../src/loop.c)
+target_link_libraries(loop
+    PRIVATE include_all
+)
+
 
