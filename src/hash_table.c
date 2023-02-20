@@ -1,6 +1,5 @@
 #include "./hash.h"
 #include "./hash_table.h"
-#include <stdio.h>
 #include <string.h>
 
 /* Internal, hash table with custom initial bucket size */
@@ -32,7 +31,13 @@ kv_pair* get_kv_pair(hash_table* in_table, char* key) {
 
 /* Frees the data used by the hash table */
 void hash_dealloc(hash_table* in_table) {
-
+    for(size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
+        for(size_t elem = 0; elem < in_table->buckets[bucket].size; elem ++) {
+            free(in_table->buckets[bucket].arr[elem].key);
+            free(in_table->buckets[bucket].arr[elem].value);
+        }
+        free_vec_kv_pair(&in_table->buckets[bucket]);
+    }
     free(in_table->buckets);
     in_table->buckets = NULL;
 }
@@ -60,17 +65,14 @@ void set_value(hash_table* in_table, char* key, void* value, size_t value_size) 
     if(get_pair) {
         free(get_pair->value); 
         get_pair->value = malloc(value_size); 
-        memcpy(value, get_pair->value, value_size); // NOLINT
+        memcpy(get_pair->value, value, value_size); // NOLINT
     }
     else {
-        puts("not found");        
         if(in_table->num_elements == in_table->bucket_size) {
-            puts("realloced");
             hash_realloc(in_table); // NOLINT
         }
         in_table->num_elements ++;
         size_t bucket = djb2((unsigned char*)key) % in_table->bucket_size;  // NOLINT
-        printf("%d\n", (int)bucket);
         kv_pair new_pair = {malloc(strlen(key)+1), malloc(value_size), value_size};
         memcpy(new_pair.key, key, strlen(key)+1); // NOLINT
         memcpy(new_pair.value, value, value_size); // NOLINT
