@@ -1,10 +1,10 @@
-#include <stdio.h> 
-#include <string.h>
-#include <stdlib.h> 
-#include <fcntl.h>
 #include <arpa/inet.h> 
-#include <sys/socket.h>
+#include <fcntl.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h>
 #include <sys/epoll.h>
+#include <sys/socket.h>
 
 // Constants for our networking configuration
 enum {

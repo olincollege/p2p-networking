@@ -1,10 +1,11 @@
+#include "./network.h"
+
+#include <arpa/inet.h> 
+#include <fcntl.h>
 #include <stdio.h> 
 #include <stdlib.h> 
-#include <fcntl.h>
-#include <arpa/inet.h> 
-#include <sys/socket.h>
 #include <sys/epoll.h>
-#include "./network.h"
+#include <sys/socket.h>
 
 uint64_t as_epoll_data(int32_t fd, int32_t type) {
     epoll_custom_data event_d = {fd, type};
