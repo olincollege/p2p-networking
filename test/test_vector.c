@@ -3,6 +3,8 @@
 
 #include "../src/vector.h"
 
+vector__(int, int) 
+
 // NOLINTBEGIN -- the magic constant warnings are useless here
 Test(vector, vector_int) {
     // add elements to container

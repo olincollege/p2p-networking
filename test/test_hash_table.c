@@ -6,8 +6,8 @@
 // NOLINTBEGIN -- the magic constant warnings are useless here
 Test(test_map, simple_test) {
     hash_table table = make_table();
-    const* key1 = "key1";
-    const* key2 = "key2";
+    char* key1 = "key1";
+    char* key2 = "key2";
     int val1 = 1;
     int val2 = 2;
     set_value(&table, key1, &val1, sizeof(val1));
@@ -51,8 +51,8 @@ Test(test_map, advance_test) {
 Test(test_map, memory_leak_test) {
     for(size_t iter = 0; iter < 10000; iter++) {
         hash_table table = make_table();
-        const* key1 = "key1";
-        const* key2 = "key2";
+        char* key1 = "key1";
+        char* key2 = "key2";
         int val1 = 1;
         int val2 = 2;
         set_value(&table, key1, &val1, sizeof(val1));
