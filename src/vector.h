@@ -3,6 +3,7 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h> 
+#pragma GCC diagnostic ignored "-Wunused-function"
 
 // NOLINTBEGIN -- false warnings from strict-prototypes and macro () enclosure also memcpy warning is non-relevant
 #define vector__(TYPE, NAME)                                              \
