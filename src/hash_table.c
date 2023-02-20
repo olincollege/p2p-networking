@@ -77,13 +77,3 @@ void set_value(hash_table* in_table, char* key, void* value, size_t value_size) 
         push_vec_kv_pair(&in_table->buckets[bucket], new_pair);
     }
 }
-
-int main() {
-   hash_table table = make_table(); 
-   char* key = "foobar";
-   int val = 10;
-   set_value(&table, key, &val, 1);
-   kv_pair* kv = get_kv_pair(&table, key);
-   printf("%d\n", *(int*) kv->value);
-
-}

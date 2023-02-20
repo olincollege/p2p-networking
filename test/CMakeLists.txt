@@ -3,14 +3,14 @@
 # conversion warnings for test code.
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-conversion")
 
-add_executable(test_hello test_hello.c)
-target_link_libraries(test_hello
-  PRIVATE hello 
+add_executable(test_hash_table test_hash_table.c)
+target_link_libraries(test_hash_table
+  PRIVATE hash_table 
   PUBLIC ${CRITERION}
 )
 add_test(
-  NAME test_hello
-  COMMAND test_hello ${CRITERION_FLAGS}
+  NAME test_hash_table
+  COMMAND test_hash_table ${CRITERION_FLAGS}
 )
 
 add_executable(test_vector test_vector.c)
