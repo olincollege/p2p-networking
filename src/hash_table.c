@@ -43,7 +43,7 @@ void hash_dealloc(hash_table* in_table) {
 }
 
 /* Reallocs the hash table to handle more elements */
-void hash_realloc(hash_table* in_table) {
+void hash_realloc(hash_table* in_table) { // NOLINT recursive resolve is fine here
     // allocate a new table with double the bucket size
     hash_table new_table = make_table__(in_table->bucket_size * 2);
     // copy elements in
@@ -60,7 +60,7 @@ void hash_realloc(hash_table* in_table) {
 }
 
 /* Updates the value of a key in a hash table */
-void set_value(hash_table* in_table, char* key, void* value, size_t value_size) {
+void set_value(hash_table* in_table, char* key, void* value, size_t value_size) { // NOLINT recursive resolve is fine here
     kv_pair* get_pair = get_kv_pair(in_table, key);     
     if(get_pair) {
         free(get_pair->value); 
