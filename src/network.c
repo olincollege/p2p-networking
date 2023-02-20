@@ -7,8 +7,8 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 
-uint64_t as_epoll_data(int32_t fd, int32_t type) {
-    epoll_custom_data event_d = {fd, type};
+uint64_t as_epoll_data(int32_t file_descriptor, int32_t type) {
+    epoll_custom_data event_d = {file_descriptor, type};
     uint64_t result;  
     memcpy(&result, &event_d, sizeof(uint64_t));
     return result;
