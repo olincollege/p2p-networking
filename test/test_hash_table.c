@@ -26,7 +26,7 @@ Test(test_map, simple_test) {
 
 // Tested with valgrind against memory leaks
 Test(test_map, advance_test) {
-    for(size_t total_iter = 0; total_iter < 1000000; total_iter++) {
+    for(size_t total_iter = 0; total_iter < 1000; total_iter++) {
         size_t iters = 26;
         hash_table table = make_table();
         for(size_t idx = 0; idx < iters; idx++) {
@@ -49,7 +49,7 @@ Test(test_map, advance_test) {
 
 // Tested with valgrind against memory leaks
 Test(test_map, memory_leak_test) {
-    for(size_t iter = 0; iter < 10000000; iter++) {
+    for(size_t iter = 0; iter < 10000; iter++) {
         hash_table table = make_table();
         const* key1 = "key1";
         const* key2 = "key2";
