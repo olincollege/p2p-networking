@@ -1,10 +1,10 @@
-#include <stdio.h> 
-#include <string.h>
-#include <stdlib.h> 
-#include <fcntl.h>
 #include <arpa/inet.h> 
-#include <sys/socket.h>
+#include <fcntl.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h>
 #include <sys/epoll.h>
+#include <sys/socket.h>
 
 // Constants for our networking configuration
 enum {
@@ -26,7 +26,7 @@ typedef struct epoll_custom_data {
     int32_t type;
 } epoll_custom_data;
 
-uint64_t as_epoll_data(int32_t fd, int32_t type); 
+uint64_t as_epoll_data(int32_t file_descriptor, int32_t type); 
 epoll_custom_data as_custom_data(uint64_t epoll_data_result);
 
 /* Makes a fcntl system call to mark a socket a non-blocking
