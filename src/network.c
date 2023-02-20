@@ -9,13 +9,13 @@
 
 uint64_t as_epoll_data(int32_t file_descriptor, int32_t type) {
     epoll_custom_data event_d = {file_descriptor, type};
-    uint64_t result;  
-    memcpy(&result, &event_d, sizeof(uint64_t));
+    uint64_t result; // NOLINT 
+    memcpy(&result, &event_d, sizeof(uint64_t)); // NOLINT
     return result;
 }
 epoll_custom_data as_custom_data(uint64_t epoll_data_result) {
-    epoll_custom_data result = {(int)0, (int)0};
-    memcpy(&result, &epoll_data_result, sizeof(uint64_t));
+    epoll_custom_data result = {0, 0};
+    memcpy(&result, &epoll_data_result, sizeof(uint64_t)); // NOLINT
     return result;
 }
 
@@ -27,36 +27,36 @@ void non_blocking_socket(int socket) {
     int flags = fcntl(socket, F_GETFL);  
     if(flags < 0) {
         puts("failed to retrieve socket flags");
-        exit(1);
+        exit(1); // NOLINT
     }
-    int set_flag = fcntl(socket, F_SETFL, flags | O_NONBLOCK);
+    int set_flag = fcntl(socket, F_SETFL, flags | O_NONBLOCK); // NOLINT intented usage
     if(set_flag < 0) {
         puts("failed to set socket flag");
-        exit(1);
+        exit(1); // NOLINT
     }
 }
 
 /* Creates a TCP socket and binds it to port */
 int create_socket() {
-    struct sockaddr_in6 server_adress = {
-        AF_INET6,                       // use ipv6 resolution
-        htons(LISTEN_PORT),             // port to listen on  
-        0,                              // null pad for inet_pton command
-    }; 
-    inet_pton(AF_INET6, "::1", &server_adress.sin6_addr); // listen on localhost
+    struct sockaddr_in6 server_adress;
+    memset(&server_adress, '\0', sizeof(server_adress));        // NOLINT
+    server_adress.sin6_family = AF_INET6;                       // use ipv6 resolution
+    server_adress.sin6_port = htons(LISTEN_PORT);               // port to listen on  
+    inet_pton(AF_INET6, "::1", &server_adress.sin6_addr);       // listen on localhost
+
 
     // try to allocate a TCP socket from OS
     int server_socket = socket(AF_INET6, SOCK_STREAM, 0);
     if(server_socket < 0) {
         puts("failed to allocate socket");
-        exit(1);
+        exit(1); // NOLINT
     }
 
     // try to bind socket to port 
     int bind_res = bind(server_socket, (const struct sockaddr*) &server_adress, sizeof(server_adress));
     if(bind_res < 0) {
         puts("failed to bind to socket"); 
-        exit(1);
+        exit(1); // NOLINT
     }
 
     // specify maximum backlog of un-accepted connections
@@ -77,10 +77,10 @@ int create_epoll_socket() {
 
     // create an epoll container for multiplexing I/O      
     // https://man7.org/linux/man-pages/man2/epoll_create.2.html
-    int epoll_descriptor = epoll_create1(0);
+    int epoll_descriptor = epoll_create1(EPOLL_CLOEXEC);
     if(epoll_descriptor < 0) {
         puts("failed to create epoll descriptor");
-        exit(1);
+        exit(1); // NOLINT
     }
 
     // wrap server socket into an epoll event 
@@ -92,7 +92,7 @@ int create_epoll_socket() {
     server_epoll.events = EPOLLIN | EPOLLET; 
     if(epoll_ctl(epoll_descriptor, EPOLL_CTL_ADD, server_socket, &server_epoll) < 0) {
         puts("failed to bind socket to epoll descriptor");
-        exit(1);
+        exit(1); // NOLINT
     }
 
     return epoll_descriptor;
