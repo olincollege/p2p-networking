@@ -1,7 +1,8 @@
+#pragma once 
+
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h> 
-#pragma clang diagnostic ignored "-Wstrict-prototypes"
 
 // NOLINTBEGIN -- false warnings from strict-prototypes and macro () enclosure also memcpy warning is non-relevant
 #define vector__(TYPE, NAME)                                              \

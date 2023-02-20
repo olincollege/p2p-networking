@@ -1,34 +1,19 @@
-#include "./vector.h"
-#include <stdio.h>
 #include "./hash.h"
 #include "./hash_table.h"
+#include <stdio.h>
 #include <string.h>
 
-/* The key/value container for our hash map */
-typedef struct kv_pair {
-    char* key; 
-    void* value; 
-    size_t value_size; 
-} kv_pair;
-
-// create a bucket container for kv_pairs
-vector__(kv_pair, kv_pair)
-
-    /* A hash table is an array of buckets */
-    typedef struct hash_table {
-        vector_kv_pair* buckets;
-        size_t bucket_size; 
-        size_t num_elements;
-    } hash_table;
-
 /* Internal, hash table with custom initial bucket size */
-hash_table __make_table(size_t bucket_size) {
+hash_table make_table__(size_t bucket_size) {
     hash_table new_table = {malloc(sizeof(vector_kv_pair) * bucket_size), bucket_size, 0};
+    for(size_t vec = 0; vec < bucket_size; vec++) {
+        new_table.buckets[vec] = new_vec_kv_pair();
+    }
     return new_table;
 }
 /* Creates a new empty hash table */
 hash_table make_table() {
-    return __make_table(2);
+    return make_table__(2);
 }
 
 /* Returns a key/value pair in the hash_table or a NULL padded struct if it does not exist */
@@ -52,18 +37,15 @@ void hash_dealloc(hash_table* in_table) {
     in_table->buckets = NULL;
 }
 
-void hash_realloc(hash_table* in_table);
-void set_value(hash_table* in_table, char* key, void* value, size_t value_size);
-
 /* Reallocs the hash table to handle more elements */
 void hash_realloc(hash_table* in_table) {
     // allocate a new table with double the bucket size
-    hash_table new_table = __make_table(in_table->bucket_size * 2);
+    hash_table new_table = make_table__(in_table->bucket_size * 2);
     // copy elements in
     for(size_t bucket = 0; bucket < in_table->bucket_size; bucket ++) {
         for(size_t element = 0; element < in_table->buckets[element].size; element++) {
             kv_pair cur_pair = in_table->buckets[bucket].arr[element]; 
-            set_value(&new_table, cur_pair.key, cur_pair.value, cur_pair.value_size);
+            set_value(&new_table, cur_pair.key, cur_pair.value, cur_pair.value_size); // NOLINT
         }
     }
     // swap new table with input table
@@ -84,10 +66,10 @@ void set_value(hash_table* in_table, char* key, void* value, size_t value_size) 
         puts("not found");        
         if(in_table->num_elements == in_table->bucket_size) {
             puts("realloced");
-            hash_realloc(in_table);
+            hash_realloc(in_table); // NOLINT
         }
         in_table->num_elements ++;
-        size_t bucket = djb2((unsigned char*)key) % in_table->bucket_size; 
+        size_t bucket = djb2((unsigned char*)key) % in_table->bucket_size;  // NOLINT
         printf("%d\n", (int)bucket);
         kv_pair new_pair = {malloc(strlen(key)+1), malloc(value_size), value_size};
         memcpy(new_pair.key, key, strlen(key)+1); // NOLINT
