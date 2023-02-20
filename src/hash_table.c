@@ -1,4 +1,5 @@
 #include "./vector.h"
+#include <stdio.h>
 #include "./hash.h"
 #include "./hash_table.h"
 #include <string.h>
@@ -22,7 +23,7 @@ vector__(kv_pair, kv_pair)
 
 /* Internal, hash table with custom initial bucket size */
 hash_table __make_table(size_t bucket_size) {
-    hash_table new_table = {malloc(sizeof(vector_kv_pair) * bucket_size), bucket_size, (size_t)0};
+    hash_table new_table = {malloc(sizeof(vector_kv_pair) * bucket_size), bucket_size, 0};
     return new_table;
 }
 /* Creates a new empty hash table */
@@ -80,26 +81,27 @@ void set_value(hash_table* in_table, char* key, void* value, size_t value_size) 
         memcpy(value, get_pair->value, value_size); // NOLINT
     }
     else {
+        puts("not found");        
         if(in_table->num_elements == in_table->bucket_size) {
+            puts("realloced");
             hash_realloc(in_table);
         }
         in_table->num_elements ++;
         size_t bucket = djb2((unsigned char*)key) % in_table->bucket_size; 
-        kv_pair new_pair = {malloc(strlen(key)), malloc(value_size), value_size};
-        memcpy(key, new_pair.key, strlen(key)); // NOLINT
-        memcpy(value, new_pair.value, value_size); // NOLINT
+        printf("%d\n", (int)bucket);
+        kv_pair new_pair = {malloc(strlen(key)+1), malloc(value_size), value_size};
+        memcpy(new_pair.key, key, strlen(key)+1); // NOLINT
+        memcpy(new_pair.value, value, value_size); // NOLINT
         push_vec_kv_pair(&in_table->buckets[bucket], new_pair);
     }
 }
 
-#include <stdio.h>
 int main() {
    hash_table table = make_table(); 
    char* key = "foobar";
-   int val = 1;
-  set_value(&table, key, &val, 1);
-  // kv_pair* kv = get_kv_pair(&table, key);
- //  printf("%d", kv->value);
-   //printf("%d", *(int*) kv->value);
+   int val = 10;
+   set_value(&table, key, &val, 1);
+   kv_pair* kv = get_kv_pair(&table, key);
+   printf("%d\n", *(int*) kv->value);
 
 }
