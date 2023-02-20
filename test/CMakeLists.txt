@@ -5,7 +5,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-conversion")
 
 add_executable(test_hash_table test_hash_table.c)
 target_link_libraries(test_hash_table
-  PRIVATE hash_table 
+  PRIVATE include_all 
   PUBLIC ${CRITERION}
 )
 add_test(
@@ -15,6 +15,7 @@ add_test(
 
 add_executable(test_vector test_vector.c)
 target_link_libraries(test_vector
+  PRIVATE include_all
   PUBLIC ${CRITERION}
 )
 add_test(

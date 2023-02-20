@@ -1,2 +1,10 @@
-add_library(hash_table vector.h network.h hash.h hash_table.c hash_table.h)
-
+add_library(
+    include_all
+    hash_table.h 
+    hash_table.c 
+    hash.h 
+    hash.c
+    vector.h
+    network.h
+    network.c
+)
