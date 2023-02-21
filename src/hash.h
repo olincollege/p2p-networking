@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string.h> 
 
 /* http://www.cse.yorku.ca/~oz/hash.html
