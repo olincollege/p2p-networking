@@ -21,7 +21,18 @@ target_link_libraries(test_vector
 add_test(
   NAME test_vector
   COMMAND test_vector ${CRITERION_FLAGS}
+
 )
+add_executable(test_message test_message.c)
+target_link_libraries(test_message
+  PRIVATE include_all
+  PUBLIC ${CRITERION}
+)
+add_test(
+  NAME test_message 
+  COMMAND test_message ${CRITERION_FLAGS}
+)
+
 
 add_executable(loop ../src/loop.c)
 target_link_libraries(loop
