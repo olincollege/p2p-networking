@@ -1,3 +1,5 @@
+#pragma once
+
 #include "./vector.h"
 
 /* The key/value container for our hash map */

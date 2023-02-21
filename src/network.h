@@ -1,3 +1,5 @@
+#pragma once
+
 #include <arpa/inet.h> 
 #include <fcntl.h>
 #include <stdio.h> 
