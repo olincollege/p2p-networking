@@ -7,4 +7,5 @@ add_library(
     vector.h
     network.h
     network.c
+    message.h
 )
