@@ -26,6 +26,7 @@ typedef struct peer_info {
 // uses the "flexible array" C11 concept (formerly known as "struct hack")
 typedef struct peer_message {
     uint32_t message_size; // sizeof(peer_message) - 4
+    uint8_t type; // should be set to 2
     peer_info peers[]; // flexible size
 } peer_message;
 
