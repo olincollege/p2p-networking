@@ -15,3 +15,17 @@ unsigned long djb2(unsigned char *str) {
     // NOLINTEND
 }
 
+// A version that takes in a generic array
+unsigned long djb2_bytes(void* bytes, size_t num) {
+    // NOLINTBEGIN
+    size_t hash = 5381;
+    char c = 0;
+    for (size_t i = 0; i < num; i++) {
+        // Treat bytes as an array of chars
+        c = ((char *) bytes)[i];
+        hash = ((hash << 5) + hash) + (size_t)c; /* hash * 33 + c */
+    }
+
+    return hash;
+    // NOLINTEND
+}
