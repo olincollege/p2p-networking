@@ -45,7 +45,7 @@ typedef struct give_message {
     uint32_t message_size; // sizeof(give_message) - 4
     uint8_t type; // should be set to 1 
     uint32_t sha256[4]; 
-    uint8_t piece[PIECE_SIZE_BYTES] ; // 1 Mib
+    uint8_t piece[PIECE_SIZE_BYTES] ; // 1 MiB
 } give_message;
 
 #pragma pack(pop)
