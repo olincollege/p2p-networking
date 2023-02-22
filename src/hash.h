@@ -8,3 +8,4 @@
 */
 unsigned long djb2(unsigned char *str); 
 
+unsigned long djb2_bytes(void* bytes, size_t num);
