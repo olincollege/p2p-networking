@@ -16,9 +16,9 @@ hash_table make_table() {
 }
 
 /* Returns a key/value pair in the hash_table or a NULL padded struct if it does not exist */
-kv_pair* get_kv_pair(hash_table* in_table, char* key) {
+kv_pair* get_kv_pair(hash_table* in_table, void* key, size_t key_size) {
     // find the bucket for the key
-    size_t bucket = djb2((unsigned char*)key) % in_table->bucket_size;    
+    size_t bucket = djb2_bytes(key, key_size) % in_table->bucket_size;    
     // walk the bucket
     for(size_t index = 0; index < (in_table->buckets[bucket].size); index++) {
         char* ret_key = in_table->buckets[bucket].arr[index].key; 
@@ -50,7 +50,7 @@ void hash_realloc(hash_table* in_table) { // NOLINT recursive resolve is fine he
     for(size_t bucket = 0; bucket < in_table->bucket_size; bucket ++) {
         for(size_t element = 0; element < in_table->buckets[element].size; element++) {
             kv_pair cur_pair = in_table->buckets[bucket].arr[element]; 
-            set_value(&new_table, cur_pair.key, cur_pair.value, cur_pair.value_size); // NOLINT
+            set_value(&new_table, cur_pair.key, cur_pair.key_size, cur_pair.value, cur_pair.value_size); // NOLINT
         }
     }
     // swap new table with input table
@@ -60,8 +60,8 @@ void hash_realloc(hash_table* in_table) { // NOLINT recursive resolve is fine he
 }
 
 /* Updates the value of a key in a hash table */
-void set_value(hash_table* in_table, char* key, void* value, size_t value_size) { // NOLINT recursive resolve is fine here
-    kv_pair* get_pair = get_kv_pair(in_table, key);     
+void set_value(hash_table* in_table, void* key, size_t key_size, void* value, size_t value_size) { // NOLINT recursive resolve is fine here
+    kv_pair* get_pair = get_kv_pair(in_table, key, key_size);     
     if(get_pair) {
         free(get_pair->value); 
         get_pair->value = malloc(value_size); 
@@ -72,9 +72,9 @@ void set_value(hash_table* in_table, char* key, void* value, size_t value_size) 
             hash_realloc(in_table); // NOLINT
         }
         in_table->num_elements ++;
-        size_t bucket = djb2((unsigned char*)key) % in_table->bucket_size;  // NOLINT
-        kv_pair new_pair = {malloc(strlen(key)+1), malloc(value_size), value_size};
-        memcpy(new_pair.key, key, strlen(key)+1); // NOLINT
+        size_t bucket = djb2_bytes(key, key_size) % in_table->bucket_size;  // NOLINT
+        kv_pair new_pair = {malloc(key_size), malloc(value_size), key_size, value_size};
+        memcpy(new_pair.key, key, key_size); // NOLINT
         memcpy(new_pair.value, value, value_size); // NOLINT
         push_vec_kv_pair(&in_table->buckets[bucket], new_pair);
     }

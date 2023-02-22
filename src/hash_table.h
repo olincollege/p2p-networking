@@ -4,8 +4,9 @@
 
 /* The key/value container for our hash map */
 typedef struct kv_pair {
-    char* key; 
+    void* key; 
     void* value;
+    size_t key_size;
     size_t value_size; 
 } kv_pair; 
 
@@ -20,10 +21,10 @@ typedef struct hash_table {
 } hash_table;
 
 /* Sets a value in the hash table. The key and value is copied by value. */
-void set_value(hash_table* in_table, char* key, void* value, size_t value_size); 
+void set_value(hash_table* in_table, void* key, size_t key_size, void* value, size_t value_size); 
 
 /* Returns a key/value pair in the hash_table or a NULL padded struct if it does not exist */
-kv_pair* get_kv_pair(hash_table* in_table, char* key);
+kv_pair* get_kv_pair(hash_table* in_table, void* key, size_t key_size);
 
 
 /* Create a new hable */
