@@ -53,6 +53,22 @@ Test(test_map, null_terminated_data) {
 
 }
 
+// test removing and collecting elements 
+Test(test_map, remove_collect_elements) {
+    hash_table table = make_table(); 
+    char key1[] = {'\0', 'a', 'b', 'c', 'd'};
+    char data1[] = {'a', 'b', 'c', 'd', 'e'};
+    
+    // hash_table is empty at the start
+    cr_assert(eq(int, 0, table.num_elements));
+
+    // hash table has one element now
+    set_value(&table, key1, sizeof(key1), data1, sizeof(data1));
+    cr_assert(eq(int, 0, table.num_elements));
+
+    hash_dealloc(&table);
+}
+
 // Tested with valgrind against memory leaks
 Test(test_map, advance_test) {
     for(size_t total_iter = 0; total_iter < 1000; total_iter++) {

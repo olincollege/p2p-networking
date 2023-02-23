@@ -55,19 +55,19 @@ void remove_kv_pair(hash_table* in_table, void* key, size_t key_size) {
     in_table->buckets[bucket] = without_key;
 }
 
-/* Returns an array with all of the key/value pairs */
-kv_pair* collect(hash_table* in_table) {
-   kv_pair* return_array = malloc(sizeof(kv_pair) * in_table->num_elements); 
-   kv_pair* array_ref = return_array; 
-   // walk the buckets
-   for(size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
+/* Returns a vector with all of the key/value pairs.
+ * Note that the keys and values are pointers and may be invalidated with any future hash_table operations. 
+ */
+vector_kv_pair collect(hash_table* in_table) {
+    vector_kv_pair collected = new_vec_kv_pair();
+    // walk the buckets
+    for(size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
         // walk the elements
         for(size_t elem = 0; elem < in_table->buckets[bucket].size; elem++) {
-            *array_ref = in_table->buckets[bucket].arr[elem];
-            array_ref++;
+            push_vec_kv_pair(&collected, in_table->buckets[bucket].arr[elem]);
         }
-   }
-   return return_array;
+    }
+    return collected;
 }
 
 /* Frees the data used by the hash table */

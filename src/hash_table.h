@@ -29,8 +29,10 @@ void remove_kv_pair(hash_table* in_table, void* key, size_t key_size);
 /* Returns a key/value pair in the hash_table or a NULL padded struct if it does not exist */
 kv_pair* get_kv_pair(hash_table* in_table, void* key, size_t key_size);
 
-/* Returns an array with all of the key/value pairs */
-kv_pair* collect(hash_table* in_table) {
+/* Returns a vector with all of the key/value pairs.
+ * Note that the keys and values are pointers and may be invalidated with any future hash_table operations. 
+ */
+vector_kv_pair collect(hash_table* in_table); 
  
 /* Create a new hable */
 hash_table make_table(); 
