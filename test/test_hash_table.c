@@ -29,6 +29,30 @@ Test(test_map, simple_test) {
     hash_dealloc(&table);
 }
 
+// the presence of a null-terminator char should not affect anything
+Test(test_map, null_terminated_data) {
+    hash_table table = make_table();
+    for(size_t total_iter = 0; total_iter < 26; total_iter++) {
+        char keyx[3] = {'\0', 'a'+total_iter%26, 'b'};
+        int datax = total_iter;
+        set_value(&table, keyx, sizeof(char)*3, &datax, sizeof(datax));
+    }
+    char key1[3] = {'\0', 'a', 'b'};
+    char key2[3] = {'\0', 'b', 'b'};
+
+    kv_pair* kv1 = get_kv_pair(&table, &key1, sizeof(char)*3); 
+    kv_pair* kv2 = get_kv_pair(&table, &key2, sizeof(char)*3); 
+
+    int res1 = *(int*)kv1->value;
+    int res2 = *(int*)kv2->value;
+
+    cr_assert(eq(int, res1, 0));
+    cr_assert(eq(int, res2, 1));
+
+    hash_dealloc(&table);
+
+}
+
 // Tested with valgrind against memory leaks
 Test(test_map, advance_test) {
     for(size_t total_iter = 0; total_iter < 1000; total_iter++) {
