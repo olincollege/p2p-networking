@@ -22,7 +22,8 @@ kv_pair* get_kv_pair(hash_table* in_table, void* key, size_t key_size) {
     // walk the bucket
     for(size_t index = 0; index < (in_table->buckets[bucket].size); index++) {
         char* ret_key = in_table->buckets[bucket].arr[index].key; 
-        if(strcmp(key, ret_key) == 0) {
+        size_t ret_key_size = in_table->buckets[bucket].arr[index].key_size;
+        if(ret_key_size == key_size && memcmp(key, ret_key, key_size) == 0) {
             return &in_table->buckets[bucket].arr[index];
         }
     }
