@@ -75,14 +75,14 @@ Test(test_map, remove_collect_elements) {
     cr_assert(eq(int, 1, elements.size));
     cr_assert(eq(int, 0, memcmp(elements.arr[0].value, &data1, sizeof(data1))));
 
+    // removing non-existant key should not do anything
+    int no_exist = 0;
+    remove_kv_pair(&table, &no_exist, sizeof(no_exist));
+    cr_assert(eq(int, 1, table.num_elements));
+
     // hash table should be empty now
     remove_kv_pair(&table, key1, sizeof(key1));
     cr_assert(eq(int, 0, table.num_elements));
-
-
-    // table should be empty
-
-
 
     hash_dealloc(&table);
 }

@@ -44,6 +44,7 @@ void remove_kv_pair(hash_table* in_table, void* key, size_t key_size) {
             // remove element 
             free(pair.key);
             free(pair.value);
+            in_table->num_elements --; 
         }
         else {
             // keep key/value pair 
