@@ -30,6 +30,46 @@ kv_pair* get_kv_pair(hash_table* in_table, void* key, size_t key_size) {
     return NULL;
 }
 
+/* Removes a key from the hash_table or does nothing is such key does not exist */
+void remove_kv_pair(hash_table* in_table, void* key, size_t key_size) {
+    // find the bucket for the key
+    size_t bucket = djb2_bytes(key, key_size) % in_table->bucket_size;    
+    vector_kv_pair without_key = new_vec_kv_pair();
+    // walk the bucket 
+    for(size_t index = 0; index < (in_table->buckets[bucket].size); index++) {
+        kv_pair pair = in_table->buckets[bucket].arr[index]; 
+        char* ret_key = pair.key;
+        size_t ret_key_size = pair.key_size; 
+        if((ret_key_size == key_size && memcmp(key, ret_key, key_size) == 0)) {
+            // remove element 
+            free(pair.key);
+            free(pair.value);
+        }
+        else {
+            // keep key/value pair 
+            push_vec_kv_pair(&without_key, pair);
+        }
+    }
+    // swap the bucket array
+    free_vec_kv_pair(&in_table->buckets[bucket]);
+    in_table->buckets[bucket] = without_key;
+}
+
+/* Returns an array with all of the key/value pairs */
+kv_pair* collect(hash_table* in_table) {
+   kv_pair* return_array = malloc(sizeof(kv_pair) * in_table->num_elements); 
+   kv_pair* array_ref = return_array; 
+   // walk the buckets
+   for(size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
+        // walk the elements
+        for(size_t elem = 0; elem < in_table->buckets[bucket].size; elem++) {
+            *array_ref = in_table->buckets[bucket].arr[elem];
+            array_ref++;
+        }
+   }
+   return return_array;
+}
+
 /* Frees the data used by the hash table */
 void hash_dealloc(hash_table* in_table) {
     for(size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
@@ -45,7 +85,7 @@ void hash_dealloc(hash_table* in_table) {
 
 /* Reallocs the hash table to handle more elements */
 void hash_realloc(hash_table* in_table) { // NOLINT recursive resolve is fine here
-    // allocate a new table with double the bucket size
+                                          // allocate a new table with double the bucket size
     hash_table new_table = make_table__(in_table->bucket_size * 2);
     // copy elements in
     for(size_t bucket = 0; bucket < in_table->bucket_size; bucket ++) {
