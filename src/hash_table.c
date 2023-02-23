@@ -58,7 +58,7 @@ void remove_kv_pair(hash_table* in_table, void* key, size_t key_size) {
 /* Returns a vector with all of the key/value pairs.
  * Note that the keys and values are pointers and may be invalidated with any future hash_table operations. 
  */
-vector_kv_pair collect(hash_table* in_table) {
+vector_kv_pair collect_table(hash_table* in_table) {
     vector_kv_pair collected = new_vec_kv_pair();
     // walk the buckets
     for(size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {

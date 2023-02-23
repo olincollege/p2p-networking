@@ -32,7 +32,7 @@ kv_pair* get_kv_pair(hash_table* in_table, void* key, size_t key_size);
 /* Returns a vector with all of the key/value pairs.
  * Note that the keys and values are pointers and may be invalidated with any future hash_table operations. 
  */
-vector_kv_pair collect(hash_table* in_table); 
+vector_kv_pair collect_table(hash_table* in_table); 
  
 /* Create a new hable */
 hash_table make_table(); 

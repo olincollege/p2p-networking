@@ -64,7 +64,25 @@ Test(test_map, remove_collect_elements) {
 
     // hash table has one element now
     set_value(&table, key1, sizeof(key1), data1, sizeof(data1));
+    cr_assert(eq(int, 1, table.num_elements));
+    
+    // table should still have one element
+    set_value(&table, key1, sizeof(key1), data1, sizeof(data1));
+    cr_assert(eq(int, 1, table.num_elements));
+
+    // collect should have one element
+    vector_kv_pair elements = collect_table(&table);
+    cr_assert(eq(int, 1, elements.size));
+    cr_assert(eq(int, 0, memcmp(elements.arr[0].value, &data1, sizeof(data1))));
+
+    // hash table should be empty now
+    remove_kv_pair(&table, key1, sizeof(key1));
     cr_assert(eq(int, 0, table.num_elements));
+
+
+    // table should be empty
+
+
 
     hash_dealloc(&table);
 }
