@@ -104,12 +104,12 @@ int create_epoll_socket() {
 
 int full_message_availiable(int socket) {
     uint32_t message[MAX_SIZE_MESSAGE_INT];
-    int message_len_recv = 0; // Message length received.
-    int message_len = 0; // The intended message length.
+    ssize_t message_len_recv = 0; // Message length received.
+    uint32_t message_len = 0; // The intended message length.
 
     // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
     // Peek the message at the socket.
-    message_len_recv = recv(socket, message, MAX_SIZE_MESSAGE_INT*4, MSG_PEEK);
+    message_len_recv = recv(socket, message, (size_t)MAX_SIZE_MESSAGE_INT*4, MSG_PEEK);
 
     if (message_len_recv >=4) {
         message_len = message[0];
