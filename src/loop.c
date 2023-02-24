@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <bits/getopt_core.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -82,8 +83,34 @@ void loop(int epoll_c, struct epoll_event *events) {
   }
 }
 
-int main() {
-  int epoll_c = create_epoll_socket();
+int main(int argc, char *argv[]) {
+
+  /* Process CLI Arguments
+   *
+   * -S server mode, uses a fixed port
+   */
+  int listen_port = 0;
+
+  char ch;
+  while ((ch = getopt(argc, argv, "S")) != EOF) {
+    switch (ch) {
+    case 'S':
+      listen_port = SERVER_LISTEN_PORT;
+      break;
+    }
+  }
+
+  if (!listen_port) {
+    // TODO, assign a random port
+    listen_port = SERVER_LISTEN_PORT;
+  }
+
+  argc -= optind;
+  argv += optind;
+
+  // Begin the actual program
+
+  int epoll_c = create_epoll_socket(listen_port);
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
   puts("running I/O loop.");
