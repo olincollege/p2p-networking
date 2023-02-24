@@ -111,7 +111,7 @@ int full_message_availiable(int socket) {
     // Peek the message at the socket.
     message_len_recv = recv(socket, message, MAX_SIZE_MESSAGE_INT*4, MSG_PEEK);
 
-    if (message_len < 4) {
+    if (message_len_recv >=4) {
         message_len = message[0];
         return message_len_recv >= message_len+4;
     }
