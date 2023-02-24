@@ -7,6 +7,10 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 
+enum {
+    MAX_SIZE_MESSAGE_INT = (1024*1024)/32+2
+};
+
 uint64_t as_epoll_data(int32_t file_descriptor, int32_t type) {
     epoll_custom_data event_d = {file_descriptor, type};
     uint64_t result; // NOLINT 
@@ -96,4 +100,21 @@ int create_epoll_socket() {
     }
 
     return epoll_descriptor;
+}
+
+int full_message_availiable(int socket) {
+    int message[MAX_SIZE_MESSAGE_INT];
+    int message_len_recv = 0; // Message length received.
+    int message_len = 0; // The intended message length.
+
+    // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
+    // Peek the message at the socket.
+    message_len_recv = recv(socket, message, MAX_SIZE_MESSAGE_INT*4, MSG_PEEK);
+
+    if (message_len < 4) {
+        message_len = message[0];
+        return message_len_recv >= message_len+4;
+    }
+    
+    return 0;
 }
