@@ -103,7 +103,7 @@ int create_epoll_socket() {
 }
 
 int full_message_availiable(int socket) {
-    int message[MAX_SIZE_MESSAGE_INT];
+    uint32_t message[MAX_SIZE_MESSAGE_INT];
     int message_len_recv = 0; // Message length received.
     int message_len = 0; // The intended message length.
 
