@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 
 enum {
-    MAX_SIZE_MESSAGE_INT = (1024*1024)/32+2
+    MAX_SIZE_MESSAGE_INT = ((1024*1024)/32)+2 // 1 Mib + 2 ints for overhead
 };
 
 uint64_t as_epoll_data(int32_t file_descriptor, int32_t type) {
