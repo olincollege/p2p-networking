@@ -42,11 +42,11 @@ void non_blocking_socket(int socket) {
 }
 
 /* Creates a TCP socket and binds it to port */
-int create_socket() {
+int create_socket(int port) {
   struct sockaddr_in6 server_adress;
   memset(&server_adress, '\0', sizeof(server_adress));  // NOLINT
   server_adress.sin6_family = AF_INET6;                 // use ipv6 resolution
-  server_adress.sin6_port = htons(LISTEN_PORT);         // port to listen on
+  server_adress.sin6_port = htons(port);                // port to listen on
   inet_pton(AF_INET6, "::1", &server_adress.sin6_addr); // listen on localhost
 
   // try to allocate a TCP socket from OS
@@ -75,9 +75,9 @@ int create_socket() {
  * We can use it to drive an I/O loop with many different types of file
  * descriptors.
  */
-int create_epoll_socket() {
+int create_epoll_socket(int port) {
   // create a socket for our server
-  int server_socket = create_socket();
+  int server_socket = create_socket(port);
   non_blocking_socket(server_socket);
 
   // create an epoll container for multiplexing I/O
