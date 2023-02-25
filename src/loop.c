@@ -89,20 +89,15 @@ int main(int argc, char *argv[]) {
    *
    * -S server mode, uses a fixed port
    */
-  int listen_port = 0;
+  int is_server = 0; // 0 is client, 1 is server
 
   char ch;
   while ((ch = getopt(argc, argv, "S")) != EOF) {
     switch (ch) {
     case 'S':
-      listen_port = SERVER_LISTEN_PORT;
+      is_server = 1;
       break;
     }
-  }
-
-  if (!listen_port) {
-    // TODO, assign a random port
-    listen_port = SERVER_LISTEN_PORT;
   }
 
   argc -= optind;
@@ -110,7 +105,12 @@ int main(int argc, char *argv[]) {
 
   // Begin the actual program
 
-  int epoll_c = create_epoll_socket(listen_port);
+  int epoll_c = 0;
+  if (is_server) {
+    epoll_c = create_epoll_socket(SERVER_LISTEN_PORT);
+  } else {
+    epoll_c = create_epoll_socket(0);
+  }
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
   puts("running I/O loop.");

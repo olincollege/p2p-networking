@@ -41,7 +41,10 @@ void non_blocking_socket(int socket) {
   }
 }
 
-/* Creates a TCP socket and binds it to port */
+/* Creates a TCP socket and binds it to port
+ *
+ * If port is 0, binds socket to a random port.
+ */
 int create_socket(int port) {
   struct sockaddr_in6 server_adress;
   memset(&server_adress, '\0', sizeof(server_adress));  // NOLINT
@@ -74,6 +77,8 @@ int create_socket(int port) {
 /* Create an epoll container for the TCP listening socket.
  * We can use it to drive an I/O loop with many different types of file
  * descriptors.
+ *
+ * If port is 0, binds socket to a random port.
  */
 int create_epoll_socket(int port) {
   // create a socket for our server
