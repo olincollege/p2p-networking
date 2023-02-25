@@ -91,17 +91,24 @@ int main(int argc, char *argv[]) {
    */
   int is_server = 0; // 0 is client, 1 is server
 
-  char ch;
-  while ((ch = getopt(argc, argv, "S")) != EOF) {
-    switch (ch) {
+  int arg = 0;
+  while ((arg = getopt(argc, argv, "S")) != EOF) {
+    // NOLINTBEGIN -- Switch is extendable to more CLI args. Linter doesn't
+    //                like 1 arg switch though.
+    switch (arg) {
     case 'S':
       is_server = 1;
       break;
     }
+    // NOLINTEND
   }
 
+  // NOLINTBEGIN -- Keeping this in case we ever want to read positional
+  //                arguments. Linter does not like that these values are never
+  //                read or used.
   argc -= optind;
   argv += optind;
+  // NOLINTEND
 
   // Begin the actual program
 
