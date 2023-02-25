@@ -41,13 +41,13 @@ epoll_custom_data as_custom_data(uint64_t epoll_data_result);
 void non_blocking_socket(int socket);
 
 /* Creates a TCP socket and binds it to port */
-int create_socket(int port);
+int create_socket(uint16_t port);
 
 /* Create an epoll container for the TCP listening socket.
  * We can use it to drive an I/O loop with many different types of file
  * descriptors.
  */
-int create_epoll_socket(int port);
+int create_epoll_socket(uint16_t port);
 
 /* "Peek" a socket to see if a full message is availabe
  * Implemented to make sure that incomplete messages are not cleared out before

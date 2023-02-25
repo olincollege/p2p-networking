@@ -2,6 +2,7 @@
 
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/epoll.h>
@@ -45,7 +46,7 @@ void non_blocking_socket(int socket) {
  *
  * If port is 0, binds socket to a random port.
  */
-int create_socket(int port) {
+int create_socket(uint16_t port) {
   struct sockaddr_in6 server_adress;
   memset(&server_adress, '\0', sizeof(server_adress));  // NOLINT
   server_adress.sin6_family = AF_INET6;                 // use ipv6 resolution
@@ -80,7 +81,7 @@ int create_socket(int port) {
  *
  * If port is 0, binds socket to a random port.
  */
-int create_epoll_socket(int port) {
+int create_epoll_socket(uint16_t port) {
   // create a socket for our server
   int server_socket = create_socket(port);
   non_blocking_socket(server_socket);
