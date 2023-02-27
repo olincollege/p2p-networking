@@ -135,7 +135,7 @@ void read_message(int file_descriptor) {
     uint8_t message_type;
     // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
     // Peek the message at the socket.
-    recv(file_descriptor, message, (size_t)MAX_SIZE_MESSAGE_INT * 4, 0);
+    recv(file_descriptor, message, sizeof(message), 0);
     memcpy(message + 4, &message_type, 1);
 
     // Ask message
@@ -146,8 +146,10 @@ void read_message(int file_descriptor) {
       struct give_message message_read;
       memcpy(message, &message_read, message_len);
     } else {
-      struct peer_message message_read;
-      memcpy(message, &peer_message, message_len);
+      // Allocate the space for the peer message's flexible array.
+      struct peer_message *message_read = malloc(sizeof(message));
+      memcpy(message, &message_read, message_len);
+      free(message_read);
     }
   }
 }
