@@ -113,9 +113,7 @@ void read_message(int file_descriptor) {
       memcpy(message, &message_read, message_len);
     } else {
       struct peer_message message_read;
-      memcpy(message, &(message_read.message_size), 4);
-      memcpy(message + 4, &(message_read.type), 1);
-      memcpy(message + 5, &(message_read.peers), message_len - 5);
+      memcpy(message, &peer_message, message_len);
     }
   }
 }
