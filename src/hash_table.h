@@ -13,8 +13,8 @@ typedef struct kv_pair {
 // create a bucket container for kv_pairs
 vector__(kv_pair, kv_pair)
 
-    /* A hash table is an array of buckets */
-    typedef struct hash_table {
+/* A hash table is an array of buckets */
+typedef struct hash_table {
   vector_kv_pair *buckets;
   size_t bucket_size;
   size_t num_elements;
