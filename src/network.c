@@ -113,7 +113,9 @@ int full_message_availiable(int socket) {
 
   if (message_len_recv >= 4) {
     message_len = message[0];
-    return message_len + 4;
+    if(message_len_recv >= message_len + 4) {
+        return message_len + 4;
+    }
   }
 
   return 0;
