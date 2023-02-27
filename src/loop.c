@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "./message.h"
 #include "./network.h"
 
 /* When epoll notifies us of a connnection of our socket, we want to accept all
@@ -123,5 +124,32 @@ int main(int argc, char *argv[]) {
   puts("running I/O loop.");
   while (1) {
     loop(epoll_c, events);
+  }
+}
+
+void read_message(int file_descriptor) {
+  int message_len = full_message_availiable(file_descriptor);
+
+  if (message_len) {
+    uint8_t message[MAX_SIZE_MESSAGE_INT*4];
+    uint8_t message_type;
+    // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
+    // Peek the message at the socket.
+    recv(file_descriptor, message, sizeof(message), 0);
+    memcpy(message + 4, &message_type, 1);
+
+    // Ask message
+    if (message_type == 0) {
+      struct ask_message message_read;
+      memcpy(message, &message_read, message_len);
+    } else if (message_type == 1) {
+      struct give_message message_read;
+      memcpy(message, &message_read, message_len);
+    } else {
+      // Allocate the space for the peer message's flexible array.
+      struct peer_message *message_read = malloc(sizeof(message));
+      memcpy(message, &message_read, message_len);
+      free(message_read);
+    }
   }
 }

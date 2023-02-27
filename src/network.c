@@ -8,9 +8,6 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 
-enum {
-  MAX_SIZE_MESSAGE_INT = ((1024 * 1024) / 32) + 2 // 1 Mib + 2 ints for overhead
-};
 
 uint64_t as_epoll_data(int32_t file_descriptor, int32_t type) {
   epoll_custom_data event_d = {file_descriptor, type};
@@ -122,7 +119,9 @@ int full_message_availiable(int socket) {
 
   if (message_len_recv >= 4) {
     message_len = message[0];
-    return message_len_recv >= message_len + 4;
+    if(message_len_recv >= message_len + 4) {
+        return message_len + 4;
+    }
   }
 
   return 0;
