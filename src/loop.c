@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <bits/getopt_core.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -83,8 +84,41 @@ void loop(int epoll_c, struct epoll_event *events) {
   }
 }
 
-int main() {
-  int epoll_c = create_epoll_socket();
+int main(int argc, char *argv[]) {
+
+  /* Process CLI Arguments
+   *
+   * -S server mode, uses a fixed port
+   */
+  int is_server = 0; // 0 is client, 1 is server
+
+  int arg = 0;
+  while ((arg = getopt(argc, argv, "S")) != EOF) {
+    // NOLINTBEGIN -- Switch is extendable to more CLI args. Linter doesn't
+    //                like 1 arg switch though.
+    switch (arg) {
+    case 'S':
+      is_server = 1;
+      break;
+    }
+    // NOLINTEND
+  }
+
+  // NOLINTBEGIN -- Keeping this in case we ever want to read positional
+  //                arguments. Linter does not like that these values are never
+  //                read or used.
+  argc -= optind;
+  argv += optind;
+  // NOLINTEND
+
+  // Begin the actual program
+
+  int epoll_c = 0;
+  if (is_server) {
+    epoll_c = create_epoll_socket(SERVER_LISTEN_PORT);
+  } else {
+    epoll_c = create_epoll_socket(0);
+  }
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
   puts("running I/O loop.");
