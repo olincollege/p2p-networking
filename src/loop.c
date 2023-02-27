@@ -97,8 +97,7 @@ void read_message(int file_descriptor) {
   int message_len = full_message_availiable(file_descriptor);
 
   if (message_len) {
-    uint8_t message[PIECE_SIZE_BYTES +
-                    8]; // The largest valid message size available
+    uint8_t message[MAX_SIZE_MESSAGE_INT*4];
     uint8_t message_type;
     // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
     // Peek the message at the socket.
