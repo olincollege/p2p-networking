@@ -96,8 +96,8 @@ int create_epoll_socket(uint16_t port) {
   server_epoll.data.u64 = as_epoll_data(server_socket, EPOLL_LISTEN_FD);
 
   // https://man7.org/linux/man-pages/man7/epoll.7.html
-  // mark as edge-triggering with I/O in
-  server_epoll.events = EPOLLIN | EPOLLET;
+  // mark as level-triggering and recieve I/O input events from socket
+  server_epoll.events = EPOLLIN;
   if (epoll_ctl(epoll_descriptor, EPOLL_CTL_ADD, server_socket, &server_epoll) <
       0) {
     puts("failed to bind socket to epoll descriptor");
