@@ -25,6 +25,12 @@ typedef struct client_state {
   hash_table clients_connected;
 } client_state;
 
+/* Initialize new state instance */
+client_state new_state(void);
+
+/* Deallocate state */
+void dealloc_state(client_state *state);
+
 /* Add an owned piece to client state. */
 void add_piece_have(client_state state, void *piece, size_t piece_size);
 

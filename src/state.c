@@ -1,9 +1,24 @@
 #include <cstddef>
 #include <cstdint>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "./hash_table.h"
 #include "./state.h"
+
+client_state new_state(void) {
+  client_state new_state = {malloc(sizeof(new_state))};
+  new_state.clients_connected = make_table();
+  new_state.pieces_have = make_table();
+  new_state.pieces_want = make_table();
+  return new_state;
+}
+
+void dealloc_state(client_state *state) {
+  hash_dealloc(&state->clients_connected);
+  hash_dealloc(&state->pieces_have);
+  hash_dealloc(&state->pieces_want);
+}
 
 void add_piece_want(client_state state, unsigned long hash) {
   set_value(&state.pieces_want, &hash, sizeof(unsigned long), NULL, 1);
