@@ -24,22 +24,22 @@ void dealloc_state(client_state *state) {
 }
 
 void add_piece_have(client_state *state, void *piece, size_t piece_size) {
-  char* piece_hash [SHA256_DIGEST_LENGTH];
+  char *piece_hash[SHA256_DIGEST_LENGTH];
   sha256(piece, piece_size, piece_hash);
   set_value(state.have, piece_hash, SHA256_DIGEST_LENGTH, piece, piece_size);
 }
 
 void remove_piece_have(client_state *state, void *piece, size_t piece_size) {
-  char* piece_hash [SHA256_DIGEST_LENGTH];
+  char *piece_hash[SHA256_DIGEST_LENGTH];
   sha256(piece, piece_size, piece_hash);
   remove_kv_pair(state.have, piece_hash, SHA256_DIGEST_LENGTH);
 }
 
-void add_piece_want(client_state *state, unsigned char* hash) {
+void add_piece_want(client_state *state, unsigned char *hash) {
   set_value(state.pieces_want, hash, SHA256_DIGEST_LENGTH, NULL, 1);
 }
 
-void remove_piece_want(client_state *state, unsigned char* hash) {
+void remove_piece_want(client_state *state, unsigned char *hash) {
   remove_kv_pair(state.pieces_want, hash, SHA256_DIGEST_LENGTH);
 }
 
