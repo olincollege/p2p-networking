@@ -27,25 +27,25 @@ client_state new_state(void);
 void dealloc_state(client_state *state);
 
 /* Add an owned piece to client state. */
-void add_piece_have(client_state state, void *piece, size_t piece_size);
+void add_piece_have(client_state *state, void *piece, size_t piece_size);
 
 /* Remove an owned piece from client state. */
-void remove_piece_have(client_state state, void *piece, size_t piece_size);
+void remove_piece_have(client_state *state, void *piece, size_t piece_size);
 
 /* Add a wanted piece to client state. */
-void add_piece_want(client_state state, unsigned long hash);
+void add_piece_want(client_state *state, unsigned long hash);
 
 /* Remove a wanted piece from client state. */
-void remove_piece_want(client_state state, unsigned long hash);
+void remove_piece_want(client_state *state, unsigned long hash);
 
 /* Add a file descriptor. */
-void add_file_descriptor(client_state state, int file_descriptor);
+void add_file_descriptor(client_state *state, int file_descriptor);
 
 /* Remove a file descriptor. */
-void remove_file_descriptor(client_state state, int file_descriptor);
+void remove_file_descriptor(client_state *state, int file_descriptor);
 
 /* Add a port. */
-void add_port(client_state state, uint16_t port);
+void add_port(client_state *state, uint16_t port);
 
 /* Remove a port. */
-void remove_port(client_state state, uint16_t port);
+void remove_port(client_state *state, uint16_t port);
