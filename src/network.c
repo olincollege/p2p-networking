@@ -2,14 +2,12 @@
 
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 
-enum {
-  MAX_SIZE_MESSAGE_INT = ((1024 * 1024) / 32) + 2 // 1 Mib + 2 ints for overhead
-};
 
 uint64_t as_epoll_data(int32_t file_descriptor, int32_t type) {
   epoll_custom_data event_d = {file_descriptor, type};
@@ -60,12 +58,16 @@ void large_buffer_socket(int socket) {
   }
 }
 
-/* Creates a TCP socket and binds it to port */
-int create_socket() {
+
+/* Creates a TCP socket and binds it to port
+ *
+ * If port is 0, binds socket to a random port.
+ */
+int create_socket(uint16_t port) {
   struct sockaddr_in6 server_adress;
   memset(&server_adress, '\0', sizeof(server_adress));  // NOLINT
   server_adress.sin6_family = AF_INET6;                 // use ipv6 resolution
-  server_adress.sin6_port = htons(LISTEN_PORT);         // port to listen on
+  server_adress.sin6_port = htons(port);                // port to listen on
   inet_pton(AF_INET6, "::1", &server_adress.sin6_addr); // listen on localhost
 
   // try to allocate a TCP socket from OS
@@ -93,10 +95,12 @@ int create_socket() {
 /* Create an epoll container for the TCP listening socket.
  * We can use it to drive an I/O loop with many different types of file
  * descriptors.
+ *
+ * If port is 0, binds socket to a random port.
  */
-int create_epoll_socket() {
+int create_epoll_socket(uint16_t port) {
   // create a socket for our server
-  int server_socket = create_socket();
+  int server_socket = create_socket(port);
   non_blocking_socket(server_socket);
 
   // create an epoll container for multiplexing I/O
@@ -112,8 +116,8 @@ int create_epoll_socket() {
   server_epoll.data.u64 = as_epoll_data(server_socket, EPOLL_LISTEN_FD);
 
   // https://man7.org/linux/man-pages/man7/epoll.7.html
-  // mark as edge-triggering with I/O in
-  server_epoll.events = EPOLLIN | EPOLLET;
+  // mark as level-triggering and recieve I/O input events from socket
+  server_epoll.events = EPOLLIN;
   if (epoll_ctl(epoll_descriptor, EPOLL_CTL_ADD, server_socket, &server_epoll) <
       0) {
     puts("failed to bind socket to epoll descriptor");
@@ -135,7 +139,9 @@ int full_message_availiable(int socket) {
 
   if (message_len_recv >= 4) {
     message_len = message[0];
-    return message_len_recv >= message_len + 4;
+    if(message_len_recv >= message_len + 4) {
+        return message_len + 4;
+    }
   }
 
   return 0;

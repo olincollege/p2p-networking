@@ -12,11 +12,13 @@
 enum {
   MAX_EPOLL_EVENTS = 50,
   MAX_LISTEN_BACKLOG = 50,
-  LISTEN_PORT = 8100,
+  SERVER_LISTEN_PORT = 8100,
   EPOLL_LISTEN_FD = 1, // mark epoll events for our socket with this code
   EPOLL_PEER_FD = 2,   // mark epoll events for peer connections with this code
   EPOLL_TIMEOUT =
-      1000 // mark epoll to block this many ms until event is recieved
+      1000, // mark epoll to block this many ms until event is recieved
+  MAX_SIZE_MESSAGE_INT = ((1024 * 1024) / 32) + 2 // 1 Mib + 2 ints for overhead
+  //this is a little more than needed because the type is only one byte
 };
 
 /* This is kind of a hack but basically the data from returned from an epoll
@@ -45,13 +47,13 @@ void non_blocking_socket(int socket);
 void large_buffer_socket(int socket);
 
 /* Creates a TCP socket and binds it to port */
-int create_socket();
+int create_socket(uint16_t port);
 
 /* Create an epoll container for the TCP listening socket.
  * We can use it to drive an I/O loop with many different types of file
  * descriptors.
  */
-int create_epoll_socket();
+int create_epoll_socket(uint16_t port);
 
 /* "Peek" a socket to see if a full message is availabe
  * Implemented to make sure that incomplete messages are not cleared out before

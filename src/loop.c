@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <bits/getopt_core.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -7,6 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "./message.h"
 #include "./network.h"
 
 /* When epoll notifies us of a connnection of our socket, we want to accept all
@@ -82,12 +84,72 @@ void loop(int epoll_c, struct epoll_event *events) {
   }
 }
 
-int main() {
-  int epoll_c = create_epoll_socket();
+int main(int argc, char *argv[]) {
+
+  /* Process CLI Arguments
+   *
+   * -S server mode, uses a fixed port
+   */
+  int is_server = 0; // 0 is client, 1 is server
+
+  int arg = 0;
+  while ((arg = getopt(argc, argv, "S")) != EOF) {
+    // NOLINTBEGIN -- Switch is extendable to more CLI args. Linter doesn't
+    //                like 1 arg switch though.
+    switch (arg) {
+    case 'S':
+      is_server = 1;
+      break;
+    }
+    // NOLINTEND
+  }
+
+  // NOLINTBEGIN -- Keeping this in case we ever want to read positional
+  //                arguments. Linter does not like that these values are never
+  //                read or used.
+  argc -= optind;
+  argv += optind;
+  // NOLINTEND
+
+  // Begin the actual program
+
+  int epoll_c = 0;
+  if (is_server) {
+    epoll_c = create_epoll_socket(SERVER_LISTEN_PORT);
+  } else {
+    epoll_c = create_epoll_socket(0);
+  }
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
   puts("running I/O loop.");
   while (1) {
     loop(epoll_c, events);
+  }
+}
+
+void read_message(int file_descriptor) {
+  int message_len = full_message_availiable(file_descriptor);
+
+  if (message_len) {
+    uint8_t message[MAX_SIZE_MESSAGE_INT*4];
+    uint8_t message_type;
+    // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
+    // Peek the message at the socket.
+    recv(file_descriptor, message, sizeof(message), 0);
+    memcpy(message + 4, &message_type, 1);
+
+    // Ask message
+    if (message_type == 0) {
+      struct ask_message message_read;
+      memcpy(message, &message_read, message_len);
+    } else if (message_type == 1) {
+      struct give_message message_read;
+      memcpy(message, &message_read, message_len);
+    } else {
+      // Allocate the space for the peer message's flexible array.
+      struct peer_message *message_read = malloc(sizeof(message));
+      memcpy(message, &message_read, message_len);
+      free(message_read);
+    }
   }
 }
