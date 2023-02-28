@@ -42,6 +42,10 @@ epoll_custom_data as_custom_data(uint64_t epoll_data_result);
  */
 void non_blocking_socket(int socket);
 
+/* See issue https://github.com/olincollege/p2p-networking/issues/25. We want to
+ * have a large buffer size. */
+void large_buffer_socket(int socket);
+
 /* Creates a TCP socket and binds it to port */
 int create_socket(uint16_t port);
 
