@@ -8,7 +8,7 @@
 
 /* Struct representing a connected client. */
 typedef struct connected_client {
-  FILE *descriptor;
+  int file_descriptor;
   uint16_t port;
 } connected_client;
 
