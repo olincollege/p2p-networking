@@ -1,9 +1,10 @@
 #pragma once
 
-#include "hash_table.h"
 #include <cstddef>
 #include <cstdint>
 #include <stdint.h>
+
+#include "./hash_table.h"
 
 /* Struct representing a connected client. */
 typedef struct connected_client {
