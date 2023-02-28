@@ -6,12 +6,6 @@
 
 #include "./hash_table.h"
 
-/* Struct representing a connected client. */
-typedef struct connected_client {
-  int file_descriptor;
-  uint16_t port;
-} connected_client;
-
 /* Struct representing state of the p2p client
  *
  * Keeps track of pieces we have, pieces we want, file descriptors of other
@@ -22,7 +16,8 @@ typedef struct connected_client {
 typedef struct client_state {
   hash_table pieces_have;
   hash_table pieces_want;
-  hash_table clients_connected;
+  hash_table file_descriptors;
+  hash_table ports;
 } client_state;
 
 /* Initialize new state instance */
@@ -43,8 +38,14 @@ void add_piece_want(client_state state, unsigned long hash);
 /* Remove a wanted piece from client state. */
 void remove_piece_want(client_state state, unsigned long hash);
 
-/* Add a connected client. */
-void add_client_connected(client_state state, connected_client client);
+/* Add a file descriptor. */
+void add_file_descriptor(client_state state, int file_descriptor);
 
-/* Remove a connected client. */
-void remove_client_connected(client_state state, connected_client client);
+/* Remove a file descriptor. */
+void remove_file_descriptor(client_state state, int file_descriptor);
+
+/* Add a port. */
+void add_port(client_state state, uint16_t port);
+
+/* Remove a port. */
+void remove_port(client_state state, uint16_t port);
