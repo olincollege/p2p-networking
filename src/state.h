@@ -30,7 +30,7 @@ void dealloc_state(client_state *state);
 void add_piece_have(client_state state, void *piece, size_t piece_size);
 
 /* Remove an owned piece from client state. */
-void remove_piece_have(client_state state, void *piece);
+void remove_piece_have(client_state state, void *piece, size_t piece_size);
 
 /* Add a wanted piece to client state. */
 void add_piece_want(client_state state, unsigned long hash);

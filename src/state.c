@@ -5,6 +5,7 @@
 
 #include "./hash_table.h"
 #include "./state.h"
+#include "/usr/include/openssl/sha.h"
 
 client_state new_state(void) {
   client_state new_state = {malloc(sizeof(new_state))};
@@ -22,12 +23,26 @@ void dealloc_state(client_state *state) {
   hash_dealloc(&state->pieces_want);
 }
 
-void add_piece_want(client_state state, unsigned long hash) {
-  set_value(&state.pieces_want, &hash, sizeof(unsigned long), NULL, 1);
+void add_piece_have(client_state state, void *piece, size_t piece_size) {
+  char* piece_hash = malloc(SHA256_DIGEST_LENGTH);
+  sha256(piece, piece_size, piece_hash);
+  set_value(&state.have, piece_hash, SHA256_DIGEST_LENGTH, piece, piece_size);
+  free(piece_hash);
 }
 
-void remove_piece_want(client_state state, unsigned long hash) {
-  remove_kv_pair(&state.pieces_want, &hash, sizeof(unsigned long));
+void remove_piece_have(client_state state, void *piece, size_t piece_size) {
+  char* piece_hash = malloc(SHA256_DIGEST_LENGTH);
+  sha256(piece, piece_size, piece_hash);
+  remove_kv_pair(&state.have, piece_hash, SHA256_DIGEST_LENGTH);
+  free(piece_hash);
+}
+
+void add_piece_want(client_state state, unsigned char* hash) {
+  set_value(&state.pieces_want, hash, SHA256_DIGEST_LENGTH, NULL, 1);
+}
+
+void remove_piece_want(client_state state, unsigned char* hash) {
+  remove_kv_pair(&state.pieces_want, hash, SHA256_DIGEST_LENGTH);
 }
 
 void add_file_descriptor(client_state state, int file_descriptor) {
