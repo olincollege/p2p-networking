@@ -33,6 +33,17 @@ add_test(
   COMMAND test_message ${CRITERION_FLAGS}
 )
 
+add_executable(test_network test_network.c)
+target_link_libraries(test_network
+  PRIVATE include_all
+  PUBLIC ${CRITERION}
+)
+add_test(
+  NAME test_network
+  COMMAND test_network ${CRITERION_FLAGS}
+)
+
+
 
 add_executable(loop ../src/loop.c)
 target_link_libraries(loop

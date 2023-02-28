@@ -45,12 +45,12 @@ void non_blocking_socket(int socket) {
 void large_buffer_socket(int socket) {
     // SO_SNDBUF, SO_SNDBUFFORCE, SO_RCVBUF, SO_RCVBUFFORCE
     int SOCKET_MAX = 1024*1024*100; // NOLINT 100 MiB
-    int set_flag = setsockopt(socket, SOL_SOCKET, SO_SNDBUF,  &SOCKET_MAX, sizeof(SOCKET_MAX));
+    int set_flag = setsockopt(socket, SOL_SOCKET, SO_SNDBUFFORCE, &SOCKET_MAX, sizeof(SOCKET_MAX));
     if(set_flag < 0) {
         puts("failed to set socket buffer, make sure you are in sudo mode!");
         exit(1); // NOLINT
     }
-    set_flag = setsockopt(socket, SOL_SOCKET, SO_RCVBUF,  &SOCKET_MAX, sizeof(SOCKET_MAX));
+    set_flag = setsockopt(socket, SOL_SOCKET, SO_RCVBUFFORCE,  &SOCKET_MAX, sizeof(SOCKET_MAX));
     if(set_flag < 0) {
         puts("failed to set socket buffer, make sure you are in sudo mode!");
         exit(1); // NOLINT
