@@ -8,7 +8,7 @@
 #include "/usr/include/openssl/sha.h"
 
 client_state new_state(void) {
-  client_state new_state = {malloc(sizeof(new_state))};
+  client_state new_state;
   new_state.file_descriptors = make_table();
   new_state.ports = make_table();
   new_state.pieces_have = make_table();
@@ -24,17 +24,15 @@ void dealloc_state(client_state *state) {
 }
 
 void add_piece_have(client_state state, void *piece, size_t piece_size) {
-  char* piece_hash = malloc(SHA256_DIGEST_LENGTH);
+  char* piece_hash [SHA256_DIGEST_LENGTH];
   sha256(piece, piece_size, piece_hash);
   set_value(&state.have, piece_hash, SHA256_DIGEST_LENGTH, piece, piece_size);
-  free(piece_hash);
 }
 
 void remove_piece_have(client_state state, void *piece, size_t piece_size) {
-  char* piece_hash = malloc(SHA256_DIGEST_LENGTH);
+  char* piece_hash [SHA256_DIGEST_LENGTH];
   sha256(piece, piece_size, piece_hash);
   remove_kv_pair(&state.have, piece_hash, SHA256_DIGEST_LENGTH);
-  free(piece_hash);
 }
 
 void add_piece_want(client_state state, unsigned char* hash) {
