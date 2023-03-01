@@ -24,14 +24,19 @@ client_state demo_state(const unsigned int max_peices,
 
   client_state state = new_state();
 
-  for (int i = 0; i < 100; i++) {
+  while (state.pieces_have.num_elements != have_amount) {
     uint8_t piece[PIECE_SIZE_BYTES] = {0};
     piece[0] = (int)rand() % max_peices;
     add_piece_have(&state, piece, sizeof(piece));
   }
-  //
-  // while (state.pieces_have.num_elements != have_amount) {
-  //  }
+
+  while (state.pieces_want.num_elements != want_amount) {
+    uint8_t piece[PIECE_SIZE_BYTES] = {0};
+    piece[0] = (int)rand() % max_peices;
+    unsigned char piece_hash[SHA256_DIGEST_LENGTH];
+    SHA256(piece, sizeof(piece), piece_hash);
+    add_piece_want(&state, piece_hash);
+  }
 
   return state;
 }
@@ -57,7 +62,9 @@ void remove_piece_have(client_state *state, void *piece, size_t piece_size) {
 }
 
 void add_piece_want(client_state *state, unsigned char *hash) {
-  set_value(&state->pieces_want, hash, SHA256_DIGEST_LENGTH, NULL, 1);
+  int empty = NULL;
+  set_value(&state->pieces_want, hash, SHA256_DIGEST_LENGTH, &empty,
+            sizeof(empty));
 }
 
 void remove_piece_want(client_state *state, unsigned char *hash) {
