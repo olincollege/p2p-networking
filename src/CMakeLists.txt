@@ -8,4 +8,8 @@ add_library(
     network.h
     network.c
     message.h
+    state.c
+    state.h
 )
+
+target_link_libraries(include_all ssl crypto)

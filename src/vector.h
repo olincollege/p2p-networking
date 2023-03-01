@@ -19,7 +19,7 @@
   static void push_vec_##NAME(vector_##NAME *vec, TYPE element) {              \
     if (vec->size == vec->alloc) {                                             \
       TYPE *new_arr = malloc(sizeof(TYPE) * vec->alloc * 2);                   \
-      memcpy(new_arr, vec->arr, sizeof(TYPE) * vec->alloc * 2);                \
+      memcpy(new_arr, vec->arr, sizeof(TYPE) * vec->alloc);                    \
       free(vec->arr);                                                          \
       vec->arr = new_arr;                                                      \
       vec->alloc *= 2;                                                         \

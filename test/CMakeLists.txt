@@ -43,6 +43,15 @@ add_test(
   COMMAND test_network ${CRITERION_FLAGS}
 )
 
+add_executable(test_state test_state.c)
+target_link_libraries(test_state
+  PRIVATE include_all ssl crypto
+  PUBLIC ${CRITERION}
+)
+add_test(
+  NAME test_state
+  COMMAND test_state ${CRITERION_FLAGS}
+)
 
 
 add_executable(loop ../src/loop.c)

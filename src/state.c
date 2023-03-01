@@ -1,11 +1,11 @@
-#include <cstddef>
-#include <cstdint>
+#include <openssl/sha.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "./hash_table.h"
+#include "./message.h"
 #include "./state.h"
-#include "/usr/include/openssl/sha.h"
 
 client_state new_state(void) {
   client_state new_state;
@@ -16,6 +16,31 @@ client_state new_state(void) {
   return new_state;
 }
 
+client_state demo_state(const unsigned int max_peices,
+                        const unsigned int have_amount,
+                        const unsigned int want_amount) {
+  // seed random generator
+  srand((unsigned int)getpid());
+
+  client_state state = new_state();
+
+  while (state.pieces_have.num_elements != have_amount) {
+    uint8_t piece[PIECE_SIZE_BYTES] = {0};
+    piece[0] = (int)rand() % max_peices;
+    add_piece_have(&state, piece, sizeof(piece));
+  }
+
+  while (state.pieces_want.num_elements != want_amount) {
+    uint8_t piece[PIECE_SIZE_BYTES] = {0};
+    piece[0] = (int)rand() % max_peices;
+    unsigned char piece_hash[SHA256_DIGEST_LENGTH];
+    SHA256(piece, sizeof(piece), piece_hash);
+    add_piece_want(&state, piece_hash);
+  }
+
+  return state;
+}
+
 void dealloc_state(client_state *state) {
   hash_dealloc(&state->file_descriptors);
   hash_dealloc(&state->ports);
@@ -24,21 +49,22 @@ void dealloc_state(client_state *state) {
 }
 
 void add_piece_have(client_state *state, void *piece, size_t piece_size) {
-  char *piece_hash[SHA256_DIGEST_LENGTH];
-  sha256(piece, piece_size, piece_hash);
-  set_value(&state->pieces_have,
-            piece_hash, SHA256_DIGEST_LENGTH,
-            piece, piece_size);
+  unsigned char piece_hash[SHA256_DIGEST_LENGTH];
+  SHA256(piece, piece_size, piece_hash);
+  set_value(&state->pieces_have, piece_hash, SHA256_DIGEST_LENGTH, piece,
+            piece_size);
 }
 
 void remove_piece_have(client_state *state, void *piece, size_t piece_size) {
-  char *piece_hash[SHA256_DIGEST_LENGTH];
-  sha256(piece, piece_size, piece_hash);
+  unsigned char piece_hash[SHA256_DIGEST_LENGTH];
+  SHA256(piece, piece_size, piece_hash);
   remove_kv_pair(&state->pieces_have, piece_hash, SHA256_DIGEST_LENGTH);
 }
 
 void add_piece_want(client_state *state, unsigned char *hash) {
-  set_value(&state->pieces_want, hash, SHA256_DIGEST_LENGTH, NULL, 1);
+  int empty = NULL;
+  set_value(&state->pieces_want, hash, SHA256_DIGEST_LENGTH, &empty,
+            sizeof(empty));
 }
 
 void remove_piece_want(client_state *state, unsigned char *hash) {
