@@ -2,6 +2,8 @@
 #include <criterion/new/assert.h>
 #include <criterion/redirect.h>
 #include <stdlib.h>
+#include <fcntl.h>
+
 
 #include "../src/state.h"
 
@@ -16,16 +18,29 @@ Test(test_state, test_random_state) {
     cr_assert(eq(int, WANT_AMOUNT, state.pieces_want.num_elements));
 }
 
-Test(test_state, test_peer_exhange, .init = cr_redirect_stdout) {
-   FILE* f_stdin = cr_get_redirected_stdin(); 
-   int fin_fd = fileno(f_stdin);
+Test(test_state, test_peer_exhange, .init = cr_redirect_stdin) {
+   remove("/tmp/test_peer_exchange");
+   int fd_in = open("/tmp/test_peer_exchange", O_CREAT | O_APPEND | O_RDWR);    
+   if(fd_in < 0) {
+        puts("failed to open test_state fd");
+   }
 
-    // say we know about 4 random ports
+   // say we know about 4 random ports
    client_state state = new_state();
    add_port(&state, 1);
    add_port(&state, 2);
    add_port(&state, 3);
    add_port(&state, 4);
+
+   // say we are connected to a "client" mocked as stdin
+   add_file_descriptor(&state, fd_in);
+
+   // attempt to broadcast to fds
+   peer_exchange(&state);
+
+   //(void)fflush(stdout);
+   //(void)fclose(stdout);
+
 }
 
 // NOLINTEND
