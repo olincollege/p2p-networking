@@ -8,7 +8,6 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 
-
 uint64_t as_epoll_data(int32_t file_descriptor, int32_t type) {
   epoll_custom_data event_d = {file_descriptor, type};
   uint64_t result;                             // NOLINT
@@ -57,7 +56,6 @@ void large_buffer_socket(int socket) {
     exit(1); // NOLINT
   }
 }
-
 
 /* Creates a TCP socket and binds it to port
  *
@@ -139,8 +137,8 @@ int full_message_availiable(int socket) {
 
   if (message_len_recv >= 4) {
     message_len = message[0];
-    if(message_len_recv >= message_len + 4) {
-        return message_len + 4;
+    if (message_len_recv >= message_len + 4) {
+      return (int)message_len + 4;
     }
   }
 
