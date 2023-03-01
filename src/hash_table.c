@@ -12,7 +12,7 @@ hash_table make_table__(size_t bucket_size) {
   return new_table;
 }
 /* Creates a new empty hash table */
-hash_table make_table() { return make_table__(2000); }
+hash_table make_table() { return make_table__(1); }
 
 /* Returns a key/value pair in the hash_table or a NULL padded struct if it does
  * not exist */
@@ -92,7 +92,7 @@ void hash_realloc(hash_table *in_table) // NOLINT recursive resolve is fine here
   hash_table new_table = make_table__(in_table->bucket_size * 2);
   // copy elements in
   for (size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
-    for (size_t element = 0; element < in_table->buckets[element].size;
+    for (size_t element = 0; element < in_table->buckets[bucket].size;
          element++) {
       kv_pair cur_pair = in_table->buckets[bucket].arr[element];
       set_value(&new_table, cur_pair.key, cur_pair.key_size, cur_pair.value,
