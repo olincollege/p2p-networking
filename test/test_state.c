@@ -59,6 +59,7 @@ Test(test_state, test_peer_exhange) {
 
     // assert against the written message
     cr_assert(eq(int, sizeof(peer_message) + 4*sizeof(peer_info), bytes_read));
+    cr_assert(eq(int, sizeof(peer_message) + 4*sizeof(peer_info) - sizeof(message->message_size), (int)message->message_size));
     cr_assert(eq(int, 2, (int)message->type)); 
 
     in_port_t port_1 = message->peers[0].addr_port;
