@@ -18,7 +18,7 @@ enum {
   EPOLL_TIMEOUT =
       1000, // mark epoll to block this many ms until event is recieved
   MAX_SIZE_MESSAGE_INT = ((1024 * 1024) / 32) + 2 // 1 Mib + 2 ints for overhead
-  //this is a little more than needed because the type is only one byte
+  // this is a little more than needed because the type is only one byte
 };
 
 /* This is kind of a hack but basically the data from returned from an epoll

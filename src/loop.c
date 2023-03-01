@@ -21,8 +21,8 @@ void on_connection(int epoll_c, int file_descriptor) {
     struct sockaddr_in6 in_address;
     socklen_t adress_length = sizeof(struct sockaddr);
     int accept_res =
-        accept(file_descriptor, (struct sockaddr *)&in_address,
-               &adress_length); // NOLINT we have no accept4 on ubuntu
+        accept(file_descriptor, (struct sockaddr *)&in_address, // NOLINT
+               &adress_length);
     if (accept_res < 0) {
       // no more connection left
       if (errno == EWOULDBLOCK || errno == EAGAIN) {
@@ -93,9 +93,9 @@ int main(int argc, char *argv[]) {
   int is_server = 0; // 0 is client, 1 is server
 
   int arg = 0;
+  // NOLINTBEGIN -- Switch is extendable to more CLI args. Linter doesn't
+  //                like 1 arg switch though.
   while ((arg = getopt(argc, argv, "S")) != EOF) {
-    // NOLINTBEGIN -- Switch is extendable to more CLI args. Linter doesn't
-    //                like 1 arg switch though.
     switch (arg) {
     case 'S':
       is_server = 1;
@@ -131,24 +131,24 @@ void read_message(int file_descriptor) {
   int message_len = full_message_availiable(file_descriptor);
 
   if (message_len) {
-    uint8_t message[MAX_SIZE_MESSAGE_INT*4];
-    uint8_t message_type;
+    uint8_t message[MAX_SIZE_MESSAGE_INT * 4];
+    uint8_t message_type = 0;
     // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
     // Peek the message at the socket.
     recv(file_descriptor, message, sizeof(message), 0);
-    memcpy(message + 4, &message_type, 1);
+    memcpy(message + 4, &message_type, 1); // NOLINT
 
     // Ask message
     if (message_type == 0) {
       struct ask_message message_read;
-      memcpy(message, &message_read, message_len);
+      memcpy(message, &message_read, message_len); // NOLINT
     } else if (message_type == 1) {
       struct give_message message_read;
-      memcpy(message, &message_read, message_len);
+      memcpy(message, &message_read, message_len); // NOLINT
     } else {
       // Allocate the space for the peer message's flexible array.
-      struct peer_message *message_read = malloc(sizeof(message));
-      memcpy(message, &message_read, message_len);
+      struct peer_message *message_read = malloc(sizeof(message)); // NOLINT
+      memcpy(message, &message_read, message_len);                 // NOLINT
       free(message_read);
     }
   }
