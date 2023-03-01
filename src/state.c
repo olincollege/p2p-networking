@@ -16,25 +16,31 @@ client_state new_state(void) {
   return new_state;
 }
 
+unsigned rand_no_lint() {
+  return (
+      unsigned)(rand()); // NOLINT(cert-msc30-c,cert-msc50-cpp,concurrency-mt-unsafe)
+}
+
 client_state demo_state(const unsigned int max_peices,
                         const unsigned int have_amount,
                         const unsigned int want_amount) {
-  // seed random generator
-  srand((unsigned int)getpid());
 
   client_state state = new_state();
 
+  // seed random generator
+  srand((unsigned int)getpid());
+
   while (state.pieces_have.num_elements != have_amount) {
-    uint8_t piece[PIECE_SIZE_BYTES] = {0};
-    piece[0] = (int)rand() % max_peices;
+    uint32_t piece[PIECE_SIZE_BYTES / 4] = {0};
+    piece[0] = rand_no_lint() % max_peices;
     add_piece_have(&state, piece, sizeof(piece));
   }
 
   while (state.pieces_want.num_elements != want_amount) {
-    uint8_t piece[PIECE_SIZE_BYTES] = {0};
-    piece[0] = (int)rand() % max_peices;
+    uint32_t piece[PIECE_SIZE_BYTES / 4] = {0};
+    piece[0] = rand_no_lint() % max_peices;
     unsigned char piece_hash[SHA256_DIGEST_LENGTH];
-    SHA256(piece, sizeof(piece), piece_hash);
+    SHA256((unsigned char *)piece, sizeof(piece), piece_hash);
     add_piece_want(&state, piece_hash);
   }
 
@@ -62,7 +68,7 @@ void remove_piece_have(client_state *state, void *piece, size_t piece_size) {
 }
 
 void add_piece_want(client_state *state, unsigned char *hash) {
-  int empty = NULL;
+  int empty = 0;
   set_value(&state->pieces_want, hash, SHA256_DIGEST_LENGTH, &empty,
             sizeof(empty));
 }
