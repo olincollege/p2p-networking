@@ -79,7 +79,9 @@ void remove_piece_want(client_state *state, unsigned char *hash) {
 }
 
 void add_file_descriptor(client_state *state, int file_descriptor) {
-  set_value(&state->file_descriptors, &file_descriptor, sizeof(int), NULL, 1);
+  int empty = 0;
+  set_value(&state->file_descriptors, &file_descriptor, sizeof(int), &empty,
+            sizeof(empty));
 }
 
 void remove_file_descriptor(client_state *state, int file_descriptor) {
@@ -87,7 +89,8 @@ void remove_file_descriptor(client_state *state, int file_descriptor) {
 }
 
 void add_port(client_state *state, uint16_t port) {
-  set_value(&state->ports, &port, sizeof(uint16_t), NULL, 1);
+  int empty = 0;
+  set_value(&state->ports, &port, sizeof(uint16_t), &empty, sizeof(empty));
 }
 
 void remove_port(client_state *state, uint16_t port) {
