@@ -45,7 +45,7 @@ add_test(
 
 add_executable(test_state test_state.c)
 target_link_libraries(test_state
-  PRIVATE include_all
+  PRIVATE include_all ssl crypto
   PUBLIC ${CRITERION}
 )
 add_test(

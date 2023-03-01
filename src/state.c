@@ -16,22 +16,22 @@ client_state new_state(void) {
   return new_state;
 }
 
-client_state demo_state() {
+client_state demo_state(const unsigned int max_peices,
+                        const unsigned int have_amount,
+                        const unsigned int want_amount) {
   // seed random generator
-  srand((int)getpid());
-
-  // parameters for our demo client
-  const unsigned int MAX_PEICES = 100;
-  const unsigned int HAVE_AMOUNT = 30;
-  const unsigned int WANT_AMOUNT = 60;
+  srand((unsigned int)getpid());
 
   client_state state = new_state();
-  while (state.pieces_have.num_elements != HAVE_AMOUNT) {
-    uint8_t piece[PIECE_SIZE_BYTES];
-    memset(piece, 0, sizeof(piece));
-    piece[0] = (int)rand() % MAX_PEICES;
+
+  for (int i = 0; i < 100; i++) {
+    uint8_t piece[PIECE_SIZE_BYTES] = {0};
+    piece[0] = (int)rand() % max_peices;
     add_piece_have(&state, piece, sizeof(piece));
   }
+  //
+  // while (state.pieces_have.num_elements != have_amount) {
+  //  }
 
   return state;
 }
