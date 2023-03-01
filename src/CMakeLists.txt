@@ -11,3 +11,5 @@ add_library(
     state.c
     state.h
 )
+
+target_link_libraries(include_all ssl crypto)

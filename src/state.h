@@ -34,10 +34,10 @@ void add_piece_have(client_state *state, void *piece, size_t piece_size);
 void remove_piece_have(client_state *state, void *piece, size_t piece_size);
 
 /* Add a wanted piece to client state. */
-void add_piece_want(client_state *state, unsigned long hash);
+void add_piece_want(client_state *state, unsigned char *hash);
 
 /* Remove a wanted piece from client state. */
-void remove_piece_want(client_state *state, unsigned long hash);
+void remove_piece_want(client_state *state, unsigned char *hash);
 
 /* Add a file descriptor. */
 void add_file_descriptor(client_state *state, int file_descriptor);
