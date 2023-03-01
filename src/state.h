@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
 #include <stdint.h>
 
 #include "./hash_table.h"
@@ -22,6 +20,9 @@ typedef struct client_state {
 
 /* Initialize new state instance */
 client_state new_state(void);
+
+/* Creates a demo state with random have/want pieces */
+client_state demo_state();
 
 /* Deallocate state */
 void dealloc_state(client_state *state);

@@ -8,4 +8,6 @@ add_library(
     network.h
     network.c
     message.h
+    state.c
+    state.h
 )

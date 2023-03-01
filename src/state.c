@@ -1,11 +1,10 @@
-#include <cstddef>
-#include <cstdint>
+#include <openssl/sha.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 #include "./hash_table.h"
+#include "./message.h"
 #include "./state.h"
-#include "/usr/include/openssl/sha.h"
 
 client_state new_state(void) {
   client_state new_state;
@@ -14,6 +13,26 @@ client_state new_state(void) {
   new_state.pieces_have = make_table();
   new_state.pieces_want = make_table();
   return new_state;
+}
+
+client_state demo_state() {
+  // seed random generator
+  srand(getpid());
+
+  // parameters for our demo client
+  unsigned int MAX_PEICES = 100;
+  unsigned int HAVE_AMOUNT = 30;
+  unsigned int WANT_AMOUNT = 60;
+
+  client_state state = new_state();
+  while (state.pieces_have.size != HAVE_AMOUNT) {
+    uint_8 piece[PIECE_SIZE_BYTES];
+    memset(piece, 0, sizeof(piece));
+    piece[0] = rand() % MAX_PEICES;
+    add_piece_have(&state, piece, sizeof(piece));
+  }
+
+  return state;
 }
 
 void dealloc_state(client_state *state) {
