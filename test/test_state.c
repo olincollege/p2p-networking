@@ -1,10 +1,12 @@
 #include <criterion/criterion.h>
 #include <criterion/new/assert.h>
 #include <criterion/redirect.h>
-#include <stdlib.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 
+#include "../src/message.h"
 #include "../src/state.h"
 
 // NOLINTBEGIN -- the magic constant warnings are useless here
@@ -18,9 +20,9 @@ Test(test_state, test_random_state) {
     cr_assert(eq(int, WANT_AMOUNT, state.pieces_want.num_elements));
 }
 
-Test(test_state, test_peer_exhange, .init = cr_redirect_stdin) {
+Test(test_state, test_peer_exhange) {
    remove("/tmp/test_peer_exchange");
-   int fd_in = open("/tmp/test_peer_exchange", O_CREAT | O_APPEND | O_RDWR);    
+   int fd_in = open("/tmp/test_peer_exchange", O_CREAT | O_APPEND | O_RDWR, S_IRUSR | S_IWUSR);    
    if(fd_in < 0) {
         puts("failed to open test_state fd");
    }
@@ -37,10 +39,23 @@ Test(test_state, test_peer_exhange, .init = cr_redirect_stdin) {
 
    // attempt to broadcast to fds
    peer_exchange(&state);
+   close(fd_in);
 
-   //(void)fflush(stdout);
-   //(void)fclose(stdout);
+   // assert against the written message
+   char* buffer = malloc(1024*1024); 
+   size_t bytes_read = 0; 
+   FILE* fd_read = fopen("/tmp/test_peer_exchange", "r");
+   while(!feof(fd_read)) {
+     char ch = fgetc(fd_read); 
+     buffer[bytes_read] = ch;
+     bytes_read++;
+   }
+   fclose(fd_read);
+   peer_message* message = malloc(bytes_read);
+   memcpy(message, buffer, bytes_read);
 
+   free(message);
+   free(buffer);
 }
 
 // NOLINTEND

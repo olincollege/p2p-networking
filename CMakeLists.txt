@@ -8,7 +8,7 @@ project(SoftSysA02
 )
 
 set(CMAKE_C_STANDARD 17)
-
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-z,stack-size=10000000000000")
 set(CMAKE_C_FLAGS "-isystem/usr/local/Cellar/criterion/2.4.1_1/include -Wall -Wextra -pedantic -Wshadow -Wconversion -Wunreachable-code -g")
 
 set(CMAKE_C_CLANG_TIDY

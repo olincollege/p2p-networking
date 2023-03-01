@@ -121,7 +121,8 @@ void peer_exchange(client_state *state) {
     ssize_t send_res = write(peer_fd, message, peer_message_size);
     printf("starting to write to peer\n");
     if (send_res < 0) {
-      printf("failed to write peer list, closing fd: %d\n, err: %d", peer_fd, (int)send_res);
+      printf("failed to write peer list, closing fd: %d\n, err: %d", peer_fd,
+             (int)send_res);
       close(peer_fd);
     } else {
       printf("sent peer list to fd: %d\n", peer_fd);
