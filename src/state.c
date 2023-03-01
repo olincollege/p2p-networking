@@ -26,35 +26,37 @@ void dealloc_state(client_state *state) {
 void add_piece_have(client_state *state, void *piece, size_t piece_size) {
   char *piece_hash[SHA256_DIGEST_LENGTH];
   sha256(piece, piece_size, piece_hash);
-  set_value(state.have, piece_hash, SHA256_DIGEST_LENGTH, piece, piece_size);
+  set_value(&state->pieces_have,
+            piece_hash, SHA256_DIGEST_LENGTH,
+            piece, piece_size);
 }
 
 void remove_piece_have(client_state *state, void *piece, size_t piece_size) {
   char *piece_hash[SHA256_DIGEST_LENGTH];
   sha256(piece, piece_size, piece_hash);
-  remove_kv_pair(state.have, piece_hash, SHA256_DIGEST_LENGTH);
+  remove_kv_pair(&state->pieces_have, piece_hash, SHA256_DIGEST_LENGTH);
 }
 
 void add_piece_want(client_state *state, unsigned char *hash) {
-  set_value(state.pieces_want, hash, SHA256_DIGEST_LENGTH, NULL, 1);
+  set_value(&state->pieces_want, hash, SHA256_DIGEST_LENGTH, NULL, 1);
 }
 
 void remove_piece_want(client_state *state, unsigned char *hash) {
-  remove_kv_pair(state.pieces_want, hash, SHA256_DIGEST_LENGTH);
+  remove_kv_pair(&state->pieces_want, hash, SHA256_DIGEST_LENGTH);
 }
 
 void add_file_descriptor(client_state *state, int file_descriptor) {
-  set_value(state.file_descriptors, &file_descriptor, sizeof(int), NULL, 1);
+  set_value(&state->file_descriptors, &file_descriptor, sizeof(int), NULL, 1);
 }
 
 void remove_file_descriptor(client_state *state, int file_descriptor) {
-  remove_kv_pair(state.file_descriptors, &file_descriptor, sizeof(int));
+  remove_kv_pair(&state->file_descriptors, &file_descriptor, sizeof(int));
 }
 
 void add_port(client_state *state, uint16_t port) {
-  set_value(state.ports, &port, sizeof(uint16_t), NULL, 1);
+  set_value(&state->ports, &port, sizeof(uint16_t), NULL, 1);
 }
 
 void remove_port(client_state *state, uint16_t port) {
-  remove_kv_pair(state.ports, &port, sizeof(uint16_t));
+  remove_kv_pair(&state->ports, &port, sizeof(uint16_t));
 }
