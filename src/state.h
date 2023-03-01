@@ -50,3 +50,6 @@ void add_port(client_state *state, uint16_t port);
 
 /* Remove a port. */
 void remove_port(client_state *state, uint16_t port);
+
+/* Exchanges peer list with connected clients */
+void peer_exchange(client_state *state);
