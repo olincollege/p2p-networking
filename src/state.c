@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <openssl/sha.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -78,7 +79,9 @@ void remove_piece_want(client_state *state, unsigned char *hash) {
 }
 
 void add_file_descriptor(client_state *state, int file_descriptor) {
-  set_value(&state->file_descriptors, &file_descriptor, sizeof(int), NULL, 1);
+  int empty = 0;
+  set_value(&state->file_descriptors, &file_descriptor, sizeof(int), &empty,
+            sizeof(empty));
 }
 
 void remove_file_descriptor(client_state *state, int file_descriptor) {
@@ -86,9 +89,48 @@ void remove_file_descriptor(client_state *state, int file_descriptor) {
 }
 
 void add_port(client_state *state, uint16_t port) {
-  set_value(&state->ports, &port, sizeof(uint16_t), NULL, 1);
+  int empty = 0;
+  set_value(&state->ports, &port, sizeof(uint16_t), &empty, sizeof(empty));
 }
 
 void remove_port(client_state *state, uint16_t port) {
   remove_kv_pair(&state->ports, &port, sizeof(uint16_t));
+}
+
+void peer_exchange(client_state *state) {
+  vector_kv_pair clients_connected = collect_table(&state->file_descriptors);
+  vector_kv_pair known_ports = collect_table(&state->ports);
+
+  // craft the peer message
+  size_t peer_message_size =
+      sizeof(peer_message) + sizeof(peer_info) * known_ports.size;
+  peer_message *message = malloc(peer_message_size);
+  message->message_size =
+      (uint32_t)(peer_message_size - sizeof(message->message_size));
+  message->type = 2;
+  for (size_t port = 0; port < known_ports.size; port++) {
+    struct sockaddr_in6 addr;
+    inet_pton(AF_INET6, "::1", &addr.sin6_addr);
+    peer_info info = {addr.sin6_addr, *(in_port_t *)known_ports.arr[port].key};
+    message->peers[port] = info;
+  }
+
+  // send the peer message
+  for (size_t peer = 0; peer < clients_connected.size; peer++) {
+    int peer_fd = *(int *)clients_connected.arr[peer].key;
+    ssize_t send_res = write(peer_fd, message, peer_message_size);
+    printf("starting to write to peer\n");
+    if (send_res < 0) {
+      printf("failed to write peer list, closing fd: %d\n, err: %d", peer_fd,
+             (int)send_res);
+      close(peer_fd);
+    } else {
+      printf("sent peer list to fd: %d\n", peer_fd);
+    }
+  }
+
+  // cleanup
+  free_vec_kv_pair(&clients_connected);
+  free_vec_kv_pair(&known_ports);
+  free(message);
 }
