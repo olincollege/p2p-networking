@@ -10,6 +10,7 @@
 
 #include "./message.h"
 #include "./network.h"
+#include "./state.h"
 
 /* When epoll notifies us of a connnection of our socket, we want to accept all
    of them and add them to our listening queue.
@@ -127,7 +128,9 @@ int main(int argc, char *argv[]) {
   }
 }
 
-void read_message(int file_descriptor) {
+
+
+void read_message(int file_descriptor, client_state *state) {
   int message_len = full_message_availiable(file_descriptor);
 
   if (message_len) {
@@ -142,12 +145,14 @@ void read_message(int file_descriptor) {
     if (message_type == 0) {
       struct ask_message message_read;
       memcpy(message, &message_read, message_len); // NOLINT
+      add_piece_have(state, &(message_read.sha256),128);
     } else if (message_type == 1) {
       struct give_message message_read;
       memcpy(message, &message_read, message_len); // NOLINT
+      add_piece_have(state, &(message_read.piece),PIECE_SIZE_BYTES);
     } else {
       // Allocate the space for the peer message's flexible array.
-      struct peer_message *message_read = malloc(sizeof(message)); // NOLINT
+      struct peer_message *message_read = malloc(message_len); // NOLINT TODO:This is not the right size of the message
       memcpy(message, &message_read, message_len);                 // NOLINT
       free(message_read);
     }
