@@ -163,7 +163,7 @@ void broadcast_want(client_state *state) {
                peer_fd, (int)send_res);
         close(peer_fd);
       } else {
-        printf("sent peer list to fd: %d\n", peer_fd);
+        printf("sent want piece message to fd: %d\n", peer_fd);
       }
     }
   }
