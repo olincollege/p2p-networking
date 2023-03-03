@@ -144,16 +144,16 @@ void read_message(int file_descriptor, client_state *state) {
     // Ask message
     if (message_type == 0) {
       struct ask_message message_read;
-      memcpy(message, &message_read, message_len); // NOLINT
+      memcpy(&message_read, &message, message_len); // NOLINT
       add_piece_have(state, &(message_read.sha256),256);
     } else if (message_type == 1) {
       struct give_message message_read;
-      memcpy(message, &message_read, message_len); // NOLINT
+      memcpy(&message_read, &message, message_len); // NOLINT
       add_piece_have(state, &(message_read.piece),PIECE_SIZE_BYTES);
     } else {
       // Allocate the space for the peer message's flexible array.
       struct peer_message *message_read = malloc(message_len); // NOLINT
-      memcpy(message, message_read, message_len);                 // NOLINT
+      memcpy(&message_read, message, message_len);                 // NOLINT
       free(message_read);
     }
   }
