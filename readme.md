@@ -33,7 +33,7 @@ Below we provide an example of how boostrapping might be architected.
 After bootstrapping, clients engage in a process known as peer exchange where clients continuiously share the IP/port information of clients that they known about with other clients. You might realize that this is actually the same implementation as bootstrapping. In fact, all clients are actually completely valid bootstrapping servers themselves. 
 
 ## Message types 
-Our client supports three types of message. An "ask" message where clients request a 1Mib piece by specifying a SHA256, a "give" message where clients send a 1Mib piece to another client, and a "peer" message, where clients send a list of IP/ports that they know about. We implemented message communication over TCP/IP socket connections. All message are prefixed with the size of the message in bytes, stored as a uint32_t. 
+Our client supports three types of message. An "ask" message where clients request a 1Mib piece by specifying a SHA256, a "give" message where clients send a 1Mib piece to another client, and a "peer" message, where clients send a list of IP/ports that they know about. We implemented message communication over TCP/IP socket connections. All messages are prefixed with the size of the message in bytes, stored as a uint32_t. 
 
 Below we provide the exact layout of the messages for documentation reference (https://github.com/olincollege/p2p-networking/blob/main/src/message.h)
 
