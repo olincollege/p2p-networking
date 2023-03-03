@@ -52,6 +52,9 @@ typedef struct peer_message {
   peer_info peers[];     // flexible size
 } peer_messa
 ```
+<p align="center">
+  <img src="./docs/peers.png" width="500"/>
+</p>
 
 ```C
 // a struct for describing the info needed to ask for a 1MB piece
@@ -61,6 +64,9 @@ typedef struct ask_message {
   uint64_t sha256[4];
 } ask_message;
 ```
+<p align="center">
+  <img src="./docs/want.png" width="500"/>
+</p>
 
 ```C
 // a struct for describing the info needed to send a 1MB piece
@@ -71,5 +77,8 @@ typedef struct give_message {
   uint8_t piece[PIECE_SIZE_BYTES]; // 1 MiB
 } give_message;
 ```
+<p align="center">
+  <img src="./docs/give.png" width="500"/>
+</p>
 
 
