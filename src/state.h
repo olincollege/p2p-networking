@@ -53,3 +53,6 @@ void remove_port(client_state *state, uint16_t port);
 
 /* Exchanges peer list with connected clients */
 void peer_exchange(client_state *state);
+
+/* Broadcast wanted pieces to connect clients */
+void broadcast_want(client_state *state);

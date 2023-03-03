@@ -1,7 +1,9 @@
 #include <arpa/inet.h>
 #include <openssl/sha.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "./hash_table.h"
@@ -109,6 +111,7 @@ void peer_exchange(client_state *state) {
       (uint32_t)(peer_message_size - sizeof(message->message_size));
   message->type = 2;
   for (size_t port = 0; port < known_ports.size; port++) {
+    // Pack known peers into the message
     struct sockaddr_in6 addr;
     inet_pton(AF_INET6, "::1", &addr.sin6_addr);
     peer_info info = {addr.sin6_addr, *(in_port_t *)known_ports.arr[port].key};
@@ -133,4 +136,39 @@ void peer_exchange(client_state *state) {
   free_vec_kv_pair(&clients_connected);
   free_vec_kv_pair(&known_ports);
   free(message);
+}
+
+void broadcast_want(client_state *state) {
+  vector_kv_pair clients_connected = collect_table(&state->file_descriptors);
+  vector_kv_pair pieces_wanted = collect_table(&state->pieces_want);
+
+  // Craft the ask message
+  ask_message message;
+  message.message_size = (uint32_t)(sizeof(ask_message) - sizeof(uint32_t));
+  message.type = 0;
+  // Nested for loops because we designed our protocol to only send 1 hash at a
+  // time
+  for (size_t hashnum = 0; hashnum < pieces_wanted.size; hashnum++) {
+    // Pack hash into message
+    memcpy(message.sha256, pieces_wanted.arr[hashnum].key, // NOLINT
+           (unsigned long)(4*sizeof(uint32_t)));
+
+    // Send the want message to each peer
+    for (size_t peer = 0; peer < clients_connected.size; peer++) {
+      int peer_fd = *(int *)clients_connected.arr[peer].key;
+      printf("starting to write to peer\n");
+      ssize_t send_res = write(peer_fd, &message, sizeof(ask_message));
+      if (send_res < 0) {
+        printf("failed to write ask message, closing fd: %d\n, err: %d",
+               peer_fd, (int)send_res);
+        close(peer_fd);
+      } else {
+        printf("sent want piece message to fd: %d\n", peer_fd);
+      }
+    }
+  }
+
+  // cleanup
+  free_vec_kv_pair(&clients_connected);
+  free_vec_kv_pair(&pieces_wanted);
 }
