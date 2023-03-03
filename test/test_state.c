@@ -92,7 +92,7 @@ Test(test_state, test_broadcast_want_1piece1client) {
     }
 
     // say we are looking for 1 piece (256bit "hash")
-    uint32_t send_hash[4] = {1, 2, 3, 4};
+    uint64_t send_hash[4] = {1, 2, 3, 4};
     client_state state = new_state();
     add_piece_want(&state, send_hash);
 
@@ -133,6 +133,10 @@ Test(test_state, test_broadcast_want_1piece1client) {
     // type field
     cr_assert(eq(int, message.type, 0));
     // sha256 field (we sent the array {1, 2, 3, 4})
+    puts(message.sha256[0]);
+    puts(message.sha256[1]);
+    puts(message.sha256[2]);
+    puts(message.sha256[3]);
     cr_assert(eq(int, message.sha256[0], 1));
     cr_assert(eq(int, message.sha256[1], 2));
     cr_assert(eq(int, message.sha256[2], 3));

@@ -151,7 +151,7 @@ void broadcast_want(client_state *state) {
   for (size_t hashnum = 0; hashnum < pieces_wanted.size; hashnum++) {
     // Pack hash into message
     memcpy(message.sha256, pieces_wanted.arr[hashnum].key, // NOLINT
-           (unsigned long)(4*sizeof(uint32_t)));
+           (unsigned long)(4*sizeof(uint64_t)));
 
     // Send the want message to each peer
     for (size_t peer = 0; peer < clients_connected.size; peer++) {
