@@ -145,16 +145,67 @@ void read_message(int file_descriptor, client_state *state) {
     if (message_type == 0) {
       struct ask_message message_read;
       memcpy(message, &message_read, message_len); // NOLINT
-      add_piece_have(state, &(message_read.sha256),128);
+      add_piece_have(state, &(message_read.sha256),256);
     } else if (message_type == 1) {
       struct give_message message_read;
       memcpy(message, &message_read, message_len); // NOLINT
       add_piece_have(state, &(message_read.piece),PIECE_SIZE_BYTES);
     } else {
       // Allocate the space for the peer message's flexible array.
-      struct peer_message *message_read = malloc(message_len); // NOLINT TODO:This is not the right size of the message
-      memcpy(message, &message_read, message_len);                 // NOLINT
+      struct peer_message *message_read = malloc(message_len); // NOLINT
+      memcpy(message, message_read, message_len);                 // NOLINT
       free(message_read);
     }
   }
+}
+
+
+// Connect to an array of peer
+void connect_to_list(peer_info *peer_list, size_t n, client_state *state, int epoll_c) {
+  int i = 0;
+  
+  for (i = 0; i < (int) n; i++) {
+    if (get_kv_pair(&(state->ports), &(peer_list->addr_port), sizeof(peer_info)) == NULL)   {
+      int new_connection = connect_to_peer(*peer_list, epoll_c);
+      if (new_connection) {
+        add_port(state, peer_list->addr_port);
+        add_file_descriptor(state, new_connection);
+      }
+    }
+    peer_list += 1;
+  }
+}
+
+
+// Connect to a peer
+// Returns file descriptor if successful, 0 if failed
+int connect_to_peer(peer_info peer, int epoll_c) {
+  int to_connect; // TCP socket file descriptor from the port that we are currently trying to connect to.
+  struct sockaddr_in6 in_address;
+  socklen_t address_length = sizeof(struct sockaddr);
+  in_address.sin6_family = AF_INET6; // use ipv6 resolution
+  in_address.sin6_port = htons(peer.addr_port); // port to listen on
+  in_address.sin6_addr = peer.sin6_addr; // IP to connect to.
+
+  to_connect = socket(AF_INET6, SOCK_STREAM, 0); // Create socket 
+
+  // Try connecting
+  if (connect(to_connect, &in_address, address_length) != -1) {
+    // start monitoring the connection
+    non_blocking_socket(to_connect);
+    struct epoll_event client_connection;
+    client_connection.data.u64 = as_epoll_data(to_connect, EPOLL_PEER_FD);
+    client_connection.events = EPOLLIN | EPOLLET;
+
+    // bind connection to epoll
+    int epoll_bind =
+        epoll_ctl(epoll_c, EPOLL_CTL_ADD, to_connect, &client_connection);
+    if (epoll_bind < 0) {
+      puts("failed to bind new connection to epoll container");
+      return 0;
+    } else {
+      return to_connect;
+    }
+  }
+  return 0;
 }
