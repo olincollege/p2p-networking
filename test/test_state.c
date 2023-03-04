@@ -94,7 +94,7 @@ Test(test_state, test_broadcast_want_1piece1client) {
     // say we are looking for 1 piece (256bit "hash")
     uint64_t send_hash[4] = {1, 2, 3, 4};
     client_state state = new_state();
-    add_piece_want(&state, send_hash);
+    add_piece_want(&state, (unsigned char *) send_hash);
 
     // say we are connected to a "client" mocked as stdin
     add_file_descriptor(&state, fd_in);
