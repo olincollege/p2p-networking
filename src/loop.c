@@ -57,7 +57,6 @@ void loop(int epoll_c, struct epoll_event *events, client_state* state) {
     puts("epoll_wait call failed");
     return;
   }
-  printf("num changes %d\n", num_changes);
   for (size_t i = 0; i < (size_t)num_changes; i++) {
     struct epoll_event epoll_e = events[i];
     int file_descriptor = as_custom_data(events[i].data.u64).fd;
@@ -124,11 +123,33 @@ int main(int argc, char *argv[]) {
   int epoll_c = server.file_descriptor;
   add_port(&state, server.port); // add ourselves to the peer broadcast
 
+    
+  if(!is_server) {
+      // bootstrap to known server
+      struct sockaddr_in6 bootstrap_addr; 
+      memset(&bootstrap_addr, '\0', sizeof(bootstrap_addr)); // NOLINT
+      bootstrap_addr.sin6_family = AF_INET6;                 // use ipv6 resolution
+      bootstrap_addr.sin6_port = htons(SERVER_LISTEN_PORT);  // port to connect on
+      inet_pton(AF_INET6, "::1", &bootstrap_addr.sin6_addr); // connect on localhost
+      peer_info bootstrap = {bootstrap_addr.sin6_addr, SERVER_LISTEN_PORT};
+      int peer_fd = connect_to_peer(bootstrap, epoll_c);
+      if(!peer_fd) {
+        puts("failed to connect to the bootstrap server!");
+        exit(1); // NOLINT
+      }
+      add_file_descriptor(&state, peer_fd);
+      puts("added bootstrap to listen queue!");
+  }
+  else {
+     puts("skipping bootstrapping because we are the bootstrap node");
+  }
+  
+
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
   printf("running I/O loop on port %d!\n", (int)server.port);
   size_t iter = 0;
-  const size_t BROADCAST_TIMEOUT = 60; // broadcast every 60sec
+  const size_t BROADCAST_TIMEOUT = 10; // broadcast every 10sec
   while (1) {
     iter++;
     if(!(iter % BROADCAST_TIMEOUT)) {
@@ -177,16 +198,17 @@ void read_message(int file_descriptor, int epoll_fd, client_state *state) {
 // Connect to a peer
 // Returns file descriptor if successful, 0 if failed
 int connect_to_peer(peer_info peer, int epoll_c) {
+  printf("attemping connection to port: %d\n", (int)peer.addr_port);
   struct sockaddr_in6 in_address;
-  socklen_t address_length = sizeof(struct sockaddr);
+  memset(&in_address, '\0', sizeof(in_address)); // NOLINT
   in_address.sin6_family = AF_INET6;            // use ipv6 resolution
-  in_address.sin6_port = htons(peer.addr_port); // port to listen on
+  in_address.sin6_port = htons(peer.addr_port); // port to connect on
   in_address.sin6_addr = peer.sin6_addr;        // IP to connect to.
 
   int to_connect = socket(AF_INET6, SOCK_STREAM, 0); // Create socket
 
   // Try connecting
-  if (connect(to_connect, (const struct sockaddr *)&in_address, address_length) != -1) {
+  if (connect(to_connect, (const struct sockaddr *)&in_address, sizeof(in_address)) != -1) {
     // start monitoring the connection
     non_blocking_socket(to_connect);
     struct epoll_event client_connection;
@@ -200,9 +222,10 @@ int connect_to_peer(peer_info peer, int epoll_c) {
       puts("failed to bind new connection to epoll container");
       return 0;
     }
+    printf("connected to peer at port: %d\n", (int)peer.addr_port);
     return to_connect;
   }
-  puts("failed to connect to peer");
+  printf("failed to connect to peer at port: %d\n", (int)peer.addr_port);
   return 0;
 }
 
