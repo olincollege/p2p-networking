@@ -120,20 +120,18 @@ int main(int argc, char *argv[]) {
 
   // Begin the actual program
 
-  int epoll_c = 0;
-  if (is_server) {
-    epoll_c = create_epoll_socket(SERVER_LISTEN_PORT);
-  } else {
-    epoll_c = create_epoll_socket(0);
-  }
+  our_server server = create_epoll_socket(is_server ? SERVER_LISTEN_PORT : 0);
+  int epoll_c = server.file_descriptor;
+  add_port(&state, server.port); // add ourselves to the peer broadcast
+
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
-  puts("running I/O loop.");
+  printf("running I/O loop on port %d!\n", (int)server.port);
   size_t iter = 0;
   const size_t BROADCAST_TIMEOUT = 60; // broadcast every 60sec
   while (1) {
     iter++;
-    if(iter % BROADCAST_TIMEOUT) {
+    if(!(iter % BROADCAST_TIMEOUT)) {
        puts("starting broadcast of want pieces");
        broadcast_want(&state);
        puts("starting broadcast of peer exchange");

@@ -13,7 +13,7 @@ Test(test_socket, check_expand_socket_buffer) {
         // make sure that we can expand socket buffer past 1MB 
 
         // get a new socket
-        int sock = create_socket(0); 
+        int sock = create_socket(0).file_descriptor; 
 
         // look at the default buffer size
         int original_rec_buffer = 0;
