@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 
@@ -44,5 +45,15 @@ typedef struct give_message {
   uint64_t sha256[4];
   uint8_t piece[PIECE_SIZE_BYTES]; // 1 MiB
 } give_message;
+
+enum {
+  ASK_MESSAGE_TYPE = 0,
+  GIVE_MESSAGE_TYPE = 1,
+  PEER_MESSAGE_TYPE = 2,
+  // For the .message_size field
+  ASK_MESSAGE_SIZE = (int)(sizeof(ask_message)-sizeof(uint32_t)), // bytes
+  GIVE_MESSAGE_SIZE = (int)(sizeof(ask_message)-sizeof(uint32_t)), // bytes
+  HASH_SIZE = 32, // bytes
+};
 
 #pragma pack(pop)
