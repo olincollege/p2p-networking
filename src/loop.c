@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "./loop.h"
 #include "./message.h"
 #include "./network.h"
 #include "./state.h"
@@ -49,7 +50,7 @@ void on_connection(int epoll_c, int file_descriptor) {
 }
 
 // main I/O loop for the program
-void loop(int epoll_c, struct epoll_event *events) {
+void loop(int epoll_c, struct epoll_event *events, client_state* state) {
   int num_changes =
       epoll_wait(epoll_c, events, MAX_EPOLL_EVENTS, EPOLL_TIMEOUT);
   if (num_changes < 0) {
@@ -86,6 +87,11 @@ void loop(int epoll_c, struct epoll_event *events) {
 }
 
 int main(int argc, char *argv[]) {
+   /* Initialize a demo state by randomly choosing have/want pieces */
+   const unsigned int SEED_MAX_PEICES = 100; 
+   const unsigned int SEED_HAVE_AMOUNT = 30;
+   const unsigned int SEED_WANT_AMOUNT = 30;
+   client_state state = demo_state(SEED_MAX_PEICES, SEED_HAVE_AMOUNT, SEED_WANT_AMOUNT);
 
   /* Process CLI Arguments
    *
@@ -124,7 +130,7 @@ int main(int argc, char *argv[]) {
 
   puts("running I/O loop.");
   while (1) {
-    loop(epoll_c, events);
+    loop(epoll_c, events, &state);
   }
 }
 
