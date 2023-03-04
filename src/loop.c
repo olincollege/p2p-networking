@@ -143,7 +143,7 @@ void read_message(int file_descriptor, client_state *state) {
     if (message_type == 0) {
       struct ask_message message_read;
       memcpy(&message_read, &message, message_len); // NOLINT
-      add_piece_have(state, &(message_read.sha256), 256);
+      send_if_have(state, message_read, file_descriptor);
     } else if (message_type == 1) {
       struct give_message message_read;
       memcpy(&message_read, &message, message_len); // NOLINT
@@ -157,39 +157,21 @@ void read_message(int file_descriptor, client_state *state) {
   }
 }
 
-// Connect to an array of peer
-void connect_to_list(peer_info *peer_list, size_t n, client_state *state,
-                     int epoll_c) {
-  int i = 0;
 
-  for (i = 0; i < (int)n; i++) {
-    if (get_kv_pair(&(state->ports), &(peer_list->addr_port),
-                    sizeof(peer_info)) == NULL) {
-      int new_connection = connect_to_peer(*peer_list, epoll_c);
-      if (new_connection) {
-        add_port(state, peer_list->addr_port);
-        add_file_descriptor(state, new_connection);
-      }
-    }
-    peer_list += 1;
-  }
-}
 
 // Connect to a peer
 // Returns file descriptor if successful, 0 if failed
 int connect_to_peer(peer_info peer, int epoll_c) {
-  int to_connect; // TCP socket file descriptor from the port that we are
-                  // currently trying to connect to.
   struct sockaddr_in6 in_address;
   socklen_t address_length = sizeof(struct sockaddr);
   in_address.sin6_family = AF_INET6;            // use ipv6 resolution
   in_address.sin6_port = htons(peer.addr_port); // port to listen on
   in_address.sin6_addr = peer.sin6_addr;        // IP to connect to.
 
-  to_connect = socket(AF_INET6, SOCK_STREAM, 0); // Create socket
+  int to_connect = socket(AF_INET6, SOCK_STREAM, 0); // Create socket
 
   // Try connecting
-  if (connect(to_connect, &in_address, address_length) != -1) {
+  if (connect(to_connect, (const struct sockaddr *)&in_address, address_length) != -1) {
     // start monitoring the connection
     non_blocking_socket(to_connect);
     struct epoll_event client_connection;
@@ -202,9 +184,25 @@ int connect_to_peer(peer_info peer, int epoll_c) {
     if (epoll_bind < 0) {
       puts("failed to bind new connection to epoll container");
       return 0;
-    } else {
-      return to_connect;
     }
+    return to_connect;
   }
+  puts("failed to connect to peer");
   return 0;
+}
+
+// Connect to an array of peer
+void connect_to_list(peer_info *peer_list, size_t n, client_state *state,
+                     int epoll_c) {
+  for (size_t peer = 0; peer < n; peer++) {
+    if (get_kv_pair(&(state->ports), &(peer_list->addr_port),
+                    sizeof(peer_info)) == NULL) {
+      int new_connection = connect_to_peer(*peer_list, epoll_c);
+      if (new_connection) {
+        add_port(state, peer_list->addr_port);
+        add_file_descriptor(state, new_connection);
+      }
+    }
+    peer_list++; 
+  }
 }
