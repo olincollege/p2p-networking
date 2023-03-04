@@ -124,6 +124,26 @@ int main(int argc, char *argv[]) {
   int epoll_c = server.file_descriptor;
   add_port(&state, server.port); // add ourselves to the peer broadcast
 
+    
+  if(!is_server) {
+      // bootstrap to known server
+      struct sockaddr_in6 bootstrap_addr; 
+      memset(&bootstrap_addr, '\0', sizeof(bootstrap_addr)); // NOLINT
+      bootstrap_addr.sin6_family = AF_INET6;                 // use ipv6 resolution
+      bootstrap_addr.sin6_port = htons(SERVER_LISTEN_PORT);  // port to connect on
+      inet_pton(AF_INET6, "::1", &bootstrap_addr.sin6_addr); // connect on localhost
+      peer_info bootstrap = {bootstrap_addr.sin6_addr, SERVER_LISTEN_PORT};
+      if(!connect_to_peer(bootstrap, epoll_c)) {
+        puts("failed to connect to the bootstrap server!");
+        exit(1); // NOLINT
+      }
+      puts("added bootstrap to listen queue!");
+  }
+  else {
+     puts("skipping bootstrapping because we are the bootstrap node");
+  }
+  
+
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
   printf("running I/O loop on port %d!\n", (int)server.port);
@@ -180,7 +200,7 @@ int connect_to_peer(peer_info peer, int epoll_c) {
   struct sockaddr_in6 in_address;
   socklen_t address_length = sizeof(struct sockaddr);
   in_address.sin6_family = AF_INET6;            // use ipv6 resolution
-  in_address.sin6_port = htons(peer.addr_port); // port to listen on
+  in_address.sin6_port = htons(peer.addr_port); // port to connect on
   in_address.sin6_addr = peer.sin6_addr;        // IP to connect to.
 
   int to_connect = socket(AF_INET6, SOCK_STREAM, 0); // Create socket
