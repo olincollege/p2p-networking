@@ -99,6 +99,13 @@ void remove_port(client_state *state, uint16_t port) {
   remove_kv_pair(&state->ports, &port, sizeof(uint16_t));
 }
 
+void send_if_have(client_state *state, ask_message message, int peer) {
+    kv_pair* piece = get_kv_pair(&state->pieces_have, message.sha256, sizeof(message.sha256)); 
+    if(piece) {
+        write(peer, piece->value, PIECE_SIZE_BYTES);
+    }
+}
+
 void peer_exchange(client_state *state) {
   vector_kv_pair clients_connected = collect_table(&state->file_descriptors);
   vector_kv_pair known_ports = collect_table(&state->ports);
