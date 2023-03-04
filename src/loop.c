@@ -57,7 +57,6 @@ void loop(int epoll_c, struct epoll_event *events, client_state* state) {
     puts("epoll_wait call failed");
     return;
   }
-  printf("num changes %d\n", num_changes);
   for (size_t i = 0; i < (size_t)num_changes; i++) {
     struct epoll_event epoll_e = events[i];
     int file_descriptor = as_custom_data(events[i].data.u64).fd;
@@ -133,10 +132,12 @@ int main(int argc, char *argv[]) {
       bootstrap_addr.sin6_port = htons(SERVER_LISTEN_PORT);  // port to connect on
       inet_pton(AF_INET6, "::1", &bootstrap_addr.sin6_addr); // connect on localhost
       peer_info bootstrap = {bootstrap_addr.sin6_addr, SERVER_LISTEN_PORT};
-      if(!connect_to_peer(bootstrap, epoll_c)) {
+      int peer_fd = connect_to_peer(bootstrap, epoll_c);
+      if(!peer_fd) {
         puts("failed to connect to the bootstrap server!");
         exit(1); // NOLINT
       }
+      add_file_descriptor(&state, peer_fd);
       puts("added bootstrap to listen queue!");
   }
   else {
@@ -148,7 +149,7 @@ int main(int argc, char *argv[]) {
 
   printf("running I/O loop on port %d!\n", (int)server.port);
   size_t iter = 0;
-  const size_t BROADCAST_TIMEOUT = 60; // broadcast every 60sec
+  const size_t BROADCAST_TIMEOUT = 10; // broadcast every 10sec
   while (1) {
     iter++;
     if(!(iter % BROADCAST_TIMEOUT)) {
