@@ -21,6 +21,12 @@ enum {
   // this is a little more than needed because the type is only one byte
 };
 
+/* Information to describe oursevles to other peers */
+typedef struct our_server {
+    uint16_t port; 
+    int file_descriptor;
+} our_server;
+
 /* This is kind of a hack but basically the data from returned from an epoll
  * event is a union of this type
  * https://man7.org/linux/man-pages/man2/epoll_ctl.2.html. Ideally, we want to
@@ -47,13 +53,13 @@ void non_blocking_socket(int socket);
 void large_buffer_socket(int socket);
 
 /* Creates a TCP socket and binds it to port */
-int create_socket(uint16_t port);
+our_server create_socket(uint16_t port);
 
 /* Create an epoll container for the TCP listening socket.
  * We can use it to drive an I/O loop with many different types of file
  * descriptors.
  */
-int create_epoll_socket(uint16_t port);
+our_server create_epoll_socket(uint16_t port);
 
 /* "Peek" a socket to see if a full message is availabe
  * Implemented to make sure that incomplete messages are not cleared out before
