@@ -61,7 +61,7 @@ void large_buffer_socket(int socket) {
  *
  * If port is 0, binds socket to a random port.
  */
-int create_socket(uint16_t port) {
+our_server create_socket(uint16_t port) {
   struct sockaddr_in6 server_adress;
   memset(&server_adress, '\0', sizeof(server_adress));  // NOLINT
   server_adress.sin6_family = AF_INET6;                 // use ipv6 resolution
@@ -87,7 +87,13 @@ int create_socket(uint16_t port) {
   // this dosn't actually do anything, just marks an attribute
   listen(server_socket, MAX_LISTEN_BACKLOG);
 
-  return server_socket;
+  our_server server;
+  socklen_t sock_len = sizeof(server_adress);
+  getsockname(server_socket, (struct sockaddr *)&server_adress, &sock_len);
+  server.file_descriptor = server_socket;
+  server.port = ntohs(server_adress.sin6_port);
+
+  return server;
 }
 
 /* Create an epoll container for the TCP listening socket.
@@ -96,9 +102,10 @@ int create_socket(uint16_t port) {
  *
  * If port is 0, binds socket to a random port.
  */
-int create_epoll_socket(uint16_t port) {
+our_server create_epoll_socket(uint16_t port) {
   // create a socket for our server
-  int server_socket = create_socket(port);
+  our_server server = create_socket(port);
+  int server_socket = server.file_descriptor;
   non_blocking_socket(server_socket);
 
   // create an epoll container for multiplexing I/O
@@ -122,7 +129,8 @@ int create_epoll_socket(uint16_t port) {
     exit(1); // NOLINT
   }
 
-  return epoll_descriptor;
+  server.file_descriptor = epoll_descriptor;
+  return server;
 }
 
 int full_message_availiable(int socket) {
