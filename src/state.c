@@ -144,14 +144,14 @@ void broadcast_want(client_state *state) {
 
   // Craft the ask message
   ask_message message;
-  message.message_size = (uint32_t)(sizeof(ask_message) - sizeof(uint32_t));
-  message.type = 0;
+  message.message_size = (uint32_t)ASK_MESSAGE_SIZE;
+  message.type = (uint8_t)ASK_MESSAGE_TYPE;
   // Nested for loops because we designed our protocol to only send 1 hash at a
   // time
   for (size_t hashnum = 0; hashnum < pieces_wanted.size; hashnum++) {
     // Pack hash into message
     memcpy(message.sha256, pieces_wanted.arr[hashnum].key, // NOLINT
-           (unsigned long)(4*sizeof(uint32_t)));
+           HASH_SIZE);
 
     // Send the want message to each peer
     for (size_t peer = 0; peer < clients_connected.size; peer++) {

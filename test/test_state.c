@@ -92,9 +92,9 @@ Test(test_state, test_broadcast_want_1piece1client) {
     }
 
     // say we are looking for 1 piece (256bit "hash")
-    uint32_t send_hash[4] = {1, 2, 3, 4};
+    uint64_t send_hash[4] = {1, 2, 3, 4};
     client_state state = new_state();
-    add_piece_want(&state, send_hash);
+    add_piece_want(&state, (unsigned char *) send_hash);
 
     // say we are connected to a "client" mocked as stdin
     add_file_descriptor(&state, fd_in);
@@ -132,7 +132,11 @@ Test(test_state, test_broadcast_want_1piece1client) {
                  sizeof(ask_message)-sizeof(uint32_t)));
     // type field
     cr_assert(eq(int, message.type, 0));
-    // sha256 field (we sent the array {1, 2, 3, 4})
+  // sha256 field (we sent the array {1, 2, 3, 4})
+    printf("%" PRIu64 "\n", message.sha256[0]);
+    printf("%" PRIu64 "\n", message.sha256[1]);
+    printf("%" PRIu64 "\n", message.sha256[2]);
+    printf("%" PRIu64 "\n", message.sha256[3]);
     cr_assert(eq(int, message.sha256[0], 1));
     cr_assert(eq(int, message.sha256[1], 2));
     cr_assert(eq(int, message.sha256[2], 3));

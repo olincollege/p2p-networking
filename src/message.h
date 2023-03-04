@@ -1,6 +1,7 @@
 #pragma once
 
 #include <netinet/in.h>
+#include <stdint.h>
 #include <sys/socket.h>
 
 /* Our slides have more info on how messages are encoded
@@ -34,15 +35,25 @@ typedef struct peer_message {
 typedef struct ask_message {
   uint32_t message_size; // sizeof(ask_message) - 4
   uint8_t type;          // should be set to 0
-  uint32_t sha256[4];
+  uint64_t sha256[4];
 } ask_message;
 
 // a struct for describing the info needed to send a 1MB piece
 typedef struct give_message {
   uint32_t message_size; // sizeof(give_message) - 4
   uint8_t type;          // should be set to 1
-  uint32_t sha256[4];
+  uint64_t sha256[4];
   uint8_t piece[PIECE_SIZE_BYTES]; // 1 MiB
 } give_message;
+
+enum {
+  ASK_MESSAGE_TYPE = 0,
+  GIVE_MESSAGE_TYPE = 1,
+  PEER_MESSAGE_TYPE = 2,
+  // For the .message_size field
+  ASK_MESSAGE_SIZE = (int)(sizeof(ask_message) - sizeof(uint32_t)),  // bytes
+  GIVE_MESSAGE_SIZE = (int)(sizeof(ask_message) - sizeof(uint32_t)), // bytes
+  HASH_SIZE = 32,                                                    // bytes
+};
 
 #pragma pack(pop)
