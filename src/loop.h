@@ -12,11 +12,7 @@ void on_connection(int epoll_c, int file_descriptor);
 void loop(int epoll_c, struct epoll_event *events, client_state* state);
 
 /* Read a message from a client and update the state */
-<<<<<<< HEAD
 void read_message(int file_descriptor, int epoll_fd, client_state *state);
-=======
-void read_message(int file_descriptor, client_state *state);
->>>>>>> 5600a5c (add loop.h forward declarations)
 
 /* Connect to a peer
  * Returns file descriptor if successful, 0 if failed
