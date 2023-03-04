@@ -78,9 +78,9 @@ void loop(int epoll_c, struct epoll_event *events, client_state* state) {
     }
     // we have data on our socket
     else if (event_type == EPOLL_PEER_FD) {
-
+      read_message(file_descriptor, epoll_c, state);
     } else {
-      puts("faillthrough");
+      puts("faillthrough error");
       return;
     }
   }
@@ -129,12 +129,21 @@ int main(int argc, char *argv[]) {
   struct epoll_event events[MAX_EPOLL_EVENTS];
 
   puts("running I/O loop.");
+  size_t iter = 0;
+  const size_t BROADCAST_TIMEOUT = 60; // broadcast every 60sec
   while (1) {
+    iter++;
+    if(iter % BROADCAST_TIMEOUT) {
+       puts("starting broadcast of want pieces");
+       broadcast_want(&state);
+       puts("starting broadcast of peer exchange");
+       peer_exchange(&state);
+    }
     loop(epoll_c, events, &state);
   }
 }
 
-void read_message(int file_descriptor, client_state *state) {
+void read_message(int file_descriptor, int epoll_fd, client_state *state) {
   int message_len = full_message_availiable(file_descriptor);
 
   if (message_len) {
@@ -158,6 +167,8 @@ void read_message(int file_descriptor, client_state *state) {
       // Allocate the space for the peer message's flexible array.
       struct peer_message *message_read = malloc(message_len); // NOLINT
       memcpy(&message_read, message, message_len);             // NOLINT
+      size_t num_peers = (message_len - sizeof(peer_message)) / sizeof(peer_info);
+      connect_to_list(message_read->peers, num_peers, state, epoll_fd);
       free(message_read);
     }
   }
