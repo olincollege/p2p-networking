@@ -132,11 +132,11 @@ Test(test_state, test_broadcast_want_1piece1client) {
                  sizeof(ask_message)-sizeof(uint32_t)));
     // type field
     cr_assert(eq(int, message.type, 0));
-    // sha256 field (we sent the array {1, 2, 3, 4})
-    puts(message.sha256[0]);
-    puts(message.sha256[1]);
-    puts(message.sha256[2]);
-    puts(message.sha256[3]);
+  // sha256 field (we sent the array {1, 2, 3, 4})
+    printf("%" PRIu64 "\n", message.sha256[0]);
+    printf("%" PRIu64 "\n", message.sha256[1]);
+    printf("%" PRIu64 "\n", message.sha256[2]);
+    printf("%" PRIu64 "\n", message.sha256[3]);
     cr_assert(eq(int, message.sha256[0], 1));
     cr_assert(eq(int, message.sha256[1], 2));
     cr_assert(eq(int, message.sha256[2], 3));
