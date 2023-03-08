@@ -161,7 +161,7 @@ void read_message(int file_descriptor, int epoll_fd, client_state *state) {
     uint8_t message_type = 0;
     // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
     // Peek the message at the socket.
-    recv(file_descriptor, message, sizeof(message), 0);
+    recv(file_descriptor, message, (size_t) message_len, 0);
     memcpy(message + 4, &message_type, 1); // NOLINT
 
     // Ask message
