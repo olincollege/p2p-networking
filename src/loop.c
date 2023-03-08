@@ -34,17 +34,9 @@ void on_connection(int epoll_c, int file_descriptor) {
       puts("error accepting connections");
       break;
     }
-    // start monitoring the connection
-    non_blocking_socket(accept_res);
-    struct epoll_event client_connection;
-    client_connection.data.u64 = as_epoll_data(accept_res, EPOLL_PEER_FD);
-    client_connection.events = EPOLLIN | EPOLLET;
-
-    // bind connection to epoll
-    int epoll_bind =
-        epoll_ctl(epoll_c, EPOLL_CTL_ADD, accept_res, &client_connection);
-    if (epoll_bind < 0) {
+    if (bind_epoll(epoll_c, accept_res) < 0) {
       puts("failed to bind new connection to epoll container");
+      return 0;
     }
   }
 }
@@ -209,16 +201,7 @@ int connect_to_peer(peer_info peer, int epoll_c) {
 
   // Try connecting
   if (connect(to_connect, (const struct sockaddr *)&in_address, sizeof(in_address)) != -1) {
-    // start monitoring the connection
-    non_blocking_socket(to_connect);
-    struct epoll_event client_connection;
-    client_connection.data.u64 = as_epoll_data(to_connect, EPOLL_PEER_FD);
-    client_connection.events = EPOLLIN | EPOLLET;
-
-    // bind connection to epoll
-    int epoll_bind =
-        epoll_ctl(epoll_c, EPOLL_CTL_ADD, to_connect, &client_connection);
-    if (epoll_bind < 0) {
+    if (bind_epoll(epoll_c, to_connect) < 0) {
       puts("failed to bind new connection to epoll container");
       return 0;
     }
@@ -243,4 +226,18 @@ void connect_to_list(peer_info *peer_list, size_t n, client_state *state,
     }
     peer_list++; 
   }
+}
+
+// Bind a file descriptor to an epoll socket.
+int bind_epoll(int epoll_c, int file_descriptor)  {
+  // start monitoring the connection
+    non_blocking_socket(file_descriptor);
+    struct epoll_event client_connection;
+    client_connection.data.u64 = as_epoll_data(file_descriptor, EPOLL_PEER_FD);
+    client_connection.events = EPOLLIN | EPOLLET;
+
+    // bind connection to epoll
+    int epoll_bind =
+        epoll_ctl(epoll_c, EPOLL_CTL_ADD, file_descriptor, &client_connection);
+    return epoll_bind;
 }
