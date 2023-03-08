@@ -167,16 +167,16 @@ void read_message(int file_descriptor, int epoll_fd, client_state *state) {
     // Ask message
     if (message_type == 0) {
       struct ask_message message_read;
-      memcpy(&message_read, &message, message_len); // NOLINT
+      memcpy(&message_read, message, message_len); // NOLINT
       send_if_have(state, message_read, file_descriptor);
     } else if (message_type == 1) {
       struct give_message message_read;
-      memcpy(&message_read, &message, message_len); // NOLINT
+      memcpy(&message_read, message, message_len); // NOLINT
       add_piece_have(state, &(message_read.piece), PIECE_SIZE_BYTES);
     } else {
       // Allocate the space for the peer message's flexible array.
       struct peer_message *message_read = malloc(message_len); // NOLINT
-      memcpy(&message_read, message, message_len);             // NOLINT
+      memcpy(message_read, message, message_len);             // NOLINT
       size_t num_peers = (message_len - sizeof(peer_message)) / sizeof(peer_info);
       connect_to_list(message_read->peers, num_peers, state, epoll_fd);
       free(message_read);
