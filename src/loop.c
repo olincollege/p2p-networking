@@ -36,7 +36,6 @@ void on_connection(int epoll_c, int file_descriptor) {
     }
     if (bind_epoll(epoll_c, accept_res) < 0) {
       puts("failed to bind new connection to epoll container");
-      return 0;
     }
   }
 }
