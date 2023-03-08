@@ -21,3 +21,6 @@ int connect_to_peer(peer_info peer, int epoll_c);
 
 // Connect to an array of peer
 void connect_to_list(peer_info *peer_list, size_t n, client_state *state, int epoll_c);
+
+// Bind a file descriptor to an epoll socket.
+int bind_epoll(int epoll_c, int file_descriptor);
