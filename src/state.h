@@ -44,7 +44,7 @@ client_state demo_state();
 void dealloc_state(client_state *state);
 
 /**
- * Add an owned piece to client state.
+ * Add an owned piece to client state and remove it from wants.
  *
  * @param state Location in memory of the client_state object
  * @param piece Location in memory of piece
