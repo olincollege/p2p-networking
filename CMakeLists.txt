@@ -2,7 +2,7 @@
 # of Ubuntu, which at the time of writing is 22.04.
 cmake_minimum_required(VERSION 3.22)
 
-project(SoftSysA02
+project(p2p-networking
   VERSION 1.0
   LANGUAGES C
 )
