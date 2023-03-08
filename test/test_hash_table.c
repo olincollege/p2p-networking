@@ -11,19 +11,19 @@ Test(test_map, simple_test) {
   hash_table table = make_table();
   // char key1[] = {'k', 'e', 'y', '1'};
   // char key2[] = {'k', 'e', 'y', '2'};
-  int key1 = 1; // We can now hash literally anything
+  int key1 = 1;  // We can now hash literally anything
   int key2 = 2;
   int val1 = 100;
   int val2 = 200;
   set_value(&table, &key1, sizeof(key1), &val1, sizeof(val1));
   set_value(&table, &key2, sizeof(key2), &val2, sizeof(val2));
 
-  kv_pair *kv1 = get_kv_pair(&table, &key1, sizeof(key1));
-  int res1 = *(int *)kv1->value;
+  kv_pair* kv1 = get_kv_pair(&table, &key1, sizeof(key1));
+  int res1 = *(int*)kv1->value;
   cr_assert(eq(int, val1, res1));
 
-  kv_pair *kv2 = get_kv_pair(&table, &key2, sizeof(key2));
-  int res2 = *(int *)kv2->value;
+  kv_pair* kv2 = get_kv_pair(&table, &key2, sizeof(key2));
+  int res2 = *(int*)kv2->value;
   cr_assert(eq(int, val2, res2));
 
   hash_dealloc(&table);
@@ -40,11 +40,11 @@ Test(test_map, null_terminated_data) {
   char key1[3] = {'\0', 'a', 'b'};
   char key2[3] = {'\0', 'b', 'b'};
 
-  kv_pair *kv1 = get_kv_pair(&table, &key1, sizeof(char) * 3);
-  kv_pair *kv2 = get_kv_pair(&table, &key2, sizeof(char) * 3);
+  kv_pair* kv1 = get_kv_pair(&table, &key1, sizeof(char) * 3);
+  kv_pair* kv2 = get_kv_pair(&table, &key2, sizeof(char) * 3);
 
-  int res1 = *(int *)kv1->value;
-  int res2 = *(int *)kv2->value;
+  int res1 = *(int*)kv1->value;
+  int res2 = *(int*)kv2->value;
 
   cr_assert(eq(int, res1, 0));
   cr_assert(eq(int, res2, 1));
@@ -101,8 +101,8 @@ Test(test_map, advance_test) {
       char key[4] = "abc";
       key[3] = 'a' + idx;
       key[4] = '\0';
-      kv_pair *kv = get_kv_pair(&table, key, strlen(key) + 1);
-      int actual_value = *(int *)kv->value;
+      kv_pair* kv = get_kv_pair(&table, key, strlen(key) + 1);
+      int actual_value = *(int*)kv->value;
       cr_assert(eq(int, idx, actual_value));
     }
     hash_dealloc(&table);
@@ -113,19 +113,19 @@ Test(test_map, advance_test) {
 Test(test_map, memory_leak_test) {
   for (size_t iter = 0; iter < 10000; iter++) {
     hash_table table = make_table();
-    char *key1 = "key1";
-    char *key2 = "key2";
+    char* key1 = "key1";
+    char* key2 = "key2";
     int val1 = 1;
     int val2 = 2;
     set_value(&table, key1, strlen(key1) + 1, &val1, sizeof(val1));
     set_value(&table, key2, strlen(key2) + 1, &val2, sizeof(val2));
 
-    kv_pair *kv1 = get_kv_pair(&table, key1, strlen(key1) + 1);
-    int res1 = *(int *)kv1->value;
+    kv_pair* kv1 = get_kv_pair(&table, key1, strlen(key1) + 1);
+    int res1 = *(int*)kv1->value;
     cr_assert(eq(int, val1, res1));
 
-    kv_pair *kv2 = get_kv_pair(&table, key2, strlen(key2) + 1);
-    int res2 = *(int *)kv2->value;
+    kv_pair* kv2 = get_kv_pair(&table, key2, strlen(key2) + 1);
+    int res2 = *(int*)kv2->value;
     cr_assert(eq(int, val2, res2));
 
     hash_dealloc(&table);
