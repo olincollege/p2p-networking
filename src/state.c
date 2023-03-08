@@ -62,6 +62,7 @@ void add_piece_have(client_state *state, void *piece, size_t piece_size) {
   SHA256(piece, piece_size, piece_hash);
   set_value(&state->pieces_have, piece_hash, SHA256_DIGEST_LENGTH, piece,
             piece_size);
+  remove_piece_want(state, piece_hash);
 }
 
 void remove_piece_have(client_state *state, void *piece, size_t piece_size) {
