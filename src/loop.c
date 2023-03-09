@@ -154,14 +154,14 @@ int main(int argc, char *argv[]) {
 }
 
 void read_message(int file_descriptor, int epoll_fd, client_state *state) {
-  int message_len = full_message_availiable(file_descriptor);
+  size_t message_len = full_message_availiable(file_descriptor);
 
   if (message_len) {
     uint8_t message[MAX_SIZE_MESSAGE_INT * 4];
     uint8_t message_type = 0;
     // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
     // Peek the message at the socket.
-    recv(file_descriptor, message, (size_t) message_len, 0);
+    recv(file_descriptor, message, message_len, 0);
     memcpy(&message_type, message + 4, 1); // NOLINT
      
     printf("processing message of type %d\n", (int)message_type);

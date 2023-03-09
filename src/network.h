@@ -95,4 +95,4 @@ our_server create_epoll_socket(uint16_t port);
  * @param socket A network socket.
  * @return Size of the full message if available, 0 otherwise.
  */
-int full_message_availiable(int socket);
+size_t full_message_availiable(int socket);
