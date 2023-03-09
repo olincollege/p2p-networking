@@ -20,7 +20,8 @@ client_state new_state(void) {
 }
 
 static unsigned rand_no_lint(void) {
-  return (unsigned)(rand()); // NOLINT(cert-msc30-c,cert-msc50-cpp,concurrency-mt-unsafe)
+  return (
+      unsigned)(rand()); // NOLINT(cert-msc30-c,cert-msc50-cpp,concurrency-mt-unsafe)
 }
 
 client_state demo_state(const unsigned int max_pieces,
@@ -100,12 +101,15 @@ void remove_port(client_state *state, uint16_t port) {
 }
 
 void send_if_have(client_state *state, ask_message message, int peer) {
-  kv_pair* piece = get_kv_pair(&state->pieces_have, message.sha256, sizeof(message.sha256));  give_message send_message;
-  if(piece) {
+  kv_pair *piece =
+      get_kv_pair(&state->pieces_have, message.sha256, sizeof(message.sha256));
+  give_message send_message;
+  if (piece) {
     send_message.message_size = GIVE_MESSAGE_SIZE;
     send_message.type = GIVE_MESSAGE_TYPE;
-    memcpy(send_message.sha256, message.sha256, sizeof(message.sha256)); //NOLINT
-    memcpy(send_message.piece, piece->value, PIECE_SIZE_BYTES); //NOLINT
+    memcpy(send_message.sha256, message.sha256,
+           sizeof(message.sha256));                             // NOLINT
+    memcpy(send_message.piece, piece->value, PIECE_SIZE_BYTES); // NOLINT
     write(peer, &send_message, sizeof(send_message));
   }
 }

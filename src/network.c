@@ -136,7 +136,7 @@ our_server create_epoll_socket(uint16_t port) {
 size_t full_message_availiable(int socket) {
   uint32_t message[MAX_SIZE_MESSAGE_INT];
   ssize_t message_len_recv = 0; // Message length received.
-  size_t message_len = 0;     // The intended message length.
+  size_t message_len = 0;       // The intended message length.
 
   // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
   // Peek the message at the socket.
