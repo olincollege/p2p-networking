@@ -13,3 +13,4 @@ add_library(
 )
 
 target_link_libraries(include_all ssl crypto)
+add_executable(loop ../src/loop.c)
