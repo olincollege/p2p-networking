@@ -37,9 +37,9 @@ client_state new_state(void);
  * @param want_amount Number of pieces the demo client initially wants.
  * @return A client_state object populated with random pieces.
  */
-client_state demo_state(const unsigned int max_pieces,
-                        const unsigned int have_amount,
-                        const unsigned int want_amount);
+client_state demo_state(unsigned int max_pieces,
+                        unsigned int have_amount,
+                        unsigned int want_amount);
 
 /**
  * Deallocate client_state object.
