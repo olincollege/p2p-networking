@@ -13,7 +13,7 @@
  * @param str A null terminated string to hash.
  * @return Result of the hashing algorithm.
  */
-unsigned long djb2(unsigned char *str);
+unsigned long djb2(unsigned char* str);
 
 /**
  * Hash binary data with the djb2 algorithm.
@@ -22,4 +22,4 @@ unsigned long djb2(unsigned char *str);
  * @param num The number of bytes to hash, (sizeof)
  * @return Result of the hashing algorithm.
  */
-unsigned long djb2_bytes(void *bytes, size_t num);
+unsigned long djb2_bytes(void* bytes, size_t num);

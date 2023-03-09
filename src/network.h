@@ -13,11 +13,12 @@ enum {
   MAX_EPOLL_EVENTS = 50,
   MAX_LISTEN_BACKLOG = 50,
   SERVER_LISTEN_PORT = 8100,
-  EPOLL_LISTEN_FD = 1, // mark epoll events for our socket with this code
-  EPOLL_PEER_FD = 2,   // mark epoll events for peer connections with this code
+  EPOLL_LISTEN_FD = 1,  // mark epoll events for our socket with this code
+  EPOLL_PEER_FD = 2,    // mark epoll events for peer connections with this code
   EPOLL_TIMEOUT =
-      1000, // mark epoll to block this many ms until event is recieved
-  MAX_SIZE_MESSAGE_INT = ((1024 * 1024 * 2) / 32) // 2 Mib + 2 ints for overhead
+      1000,  // mark epoll to block this many ms until event is recieved
+  MAX_SIZE_MESSAGE_INT =
+      ((1024 * 1024 * 2) / 32)  // 2 Mib + 2 ints for overhead
   // this is a little more than needed because the type is only one byte
 };
 

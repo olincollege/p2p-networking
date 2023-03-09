@@ -19,19 +19,19 @@ Test(test_socket, check_expand_socket_buffer) {
     // look at the default buffer size
     int original_rec_buffer = 0;
     unsigned int int_size = sizeof(original_rec_buffer);
-    getsockopt(sock, SOL_SOCKET, SO_RCVBUF, (void *)&original_rec_buffer,
+    getsockopt(sock, SOL_SOCKET, SO_RCVBUF, (void*)&original_rec_buffer,
                &int_size);
 
     // increase the buffer size
     large_buffer_socket(sock);
 
     // look at the new buffer size
-    int EXPECTED_BUFFER_SIZE = 1024 * 1024 * 100; // 100 Mib
+    int EXPECTED_BUFFER_SIZE = 1024 * 1024 * 100;  // 100 Mib
     int changed_rec_buffer = 0;
     int changed_send_buffer = 0;
-    getsockopt(sock, SOL_SOCKET, SO_RCVBUF, (void *)&changed_rec_buffer,
+    getsockopt(sock, SOL_SOCKET, SO_RCVBUF, (void*)&changed_rec_buffer,
                &int_size);
-    getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (void *)&changed_send_buffer,
+    getsockopt(sock, SOL_SOCKET, SO_SNDBUF, (void*)&changed_send_buffer,
                &int_size);
 
     cr_assert(eq(int, 1, changed_rec_buffer > original_rec_buffer));

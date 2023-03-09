@@ -19,31 +19,31 @@ enum { PIECE_SIZE_BYTES = (1024 * 1024) / 8 };
 
 // a struct for describing the info needed to address a peer
 typedef struct peer_info {
-  struct in6_addr sin6_addr; // 128 bit ipv6 adress
-  in_port_t addr_port;       // uint16 for port number
+  struct in6_addr sin6_addr;  // 128 bit ipv6 adress
+  in_port_t addr_port;        // uint16 for port number
 } peer_info;
 
 // a struct for describing the info needed to send a peer list
 // uses the "flexible array" C11 concept (formerly known as "struct hack")
 typedef struct peer_message {
-  uint32_t message_size; // sizeof(peer_message) - 4
-  uint8_t type;          // should be set to 2
-  peer_info peers[];     // flexible size
+  uint32_t message_size;  // sizeof(peer_message) - 4
+  uint8_t type;           // should be set to 2
+  peer_info peers[];      // flexible size
 } peer_message;
 
 // a struct for describing the info needed to ask for a 1MB piece
 typedef struct ask_message {
-  uint32_t message_size; // sizeof(ask_message) - 4
-  uint8_t type;          // should be set to 0
+  uint32_t message_size;  // sizeof(ask_message) - 4
+  uint8_t type;           // should be set to 0
   uint64_t sha256[4];
 } ask_message;
 
 // a struct for describing the info needed to send a 1MB piece
 typedef struct give_message {
-  uint32_t message_size; // sizeof(give_message) - 4
-  uint8_t type;          // should be set to 1
+  uint32_t message_size;  // sizeof(give_message) - 4
+  uint8_t type;           // should be set to 1
   uint64_t sha256[4];
-  uint8_t piece[PIECE_SIZE_BYTES]; // 1 MiB
+  uint8_t piece[PIECE_SIZE_BYTES];  // 1 MiB
 } give_message;
 
 enum {
@@ -51,9 +51,9 @@ enum {
   GIVE_MESSAGE_TYPE = 1,
   PEER_MESSAGE_TYPE = 2,
   // For the .message_size field
-  ASK_MESSAGE_SIZE = (int)(sizeof(ask_message) - sizeof(uint32_t)),   // bytes
-  GIVE_MESSAGE_SIZE = (int)(sizeof(give_message) - sizeof(uint32_t)), // bytes
-  HASH_SIZE = 32,                                                     // bytes
+  ASK_MESSAGE_SIZE = (int)(sizeof(ask_message) - sizeof(uint32_t)),    // bytes
+  GIVE_MESSAGE_SIZE = (int)(sizeof(give_message) - sizeof(uint32_t)),  // bytes
+  HASH_SIZE = 32,                                                      // bytes
 };
 
 #pragma pack(pop)

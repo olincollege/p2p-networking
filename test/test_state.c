@@ -45,9 +45,9 @@ Test(test_state, test_peer_exhange) {
   close(fd_in);
 
   // recover the written message
-  char *buffer = malloc(1024 * 1024);
+  char* buffer = malloc(1024 * 1024);
   size_t bytes_read = 0;
-  FILE *fd_read = fopen("/tmp/test_peer_exchange", "r");
+  FILE* fd_read = fopen("/tmp/test_peer_exchange", "r");
   while (1) {
     char ch = fgetc(fd_read);
     if (feof(fd_read)) {
@@ -57,7 +57,7 @@ Test(test_state, test_peer_exhange) {
     bytes_read++;
   }
   fclose(fd_read);
-  peer_message *message = malloc(bytes_read);
+  peer_message* message = malloc(bytes_read);
   memcpy(message, buffer, bytes_read);
 
   // assert against the written message
@@ -100,7 +100,7 @@ Test(test_state, test_broadcast_want_1piece1client) {
   // say we are looking for 1 piece (256bit "hash")
   uint64_t send_hash[4] = {1, 2, 3, 4};
   client_state state = new_state();
-  add_piece_want(&state, (unsigned char *)send_hash);
+  add_piece_want(&state, (unsigned char*)send_hash);
 
   // say we are connected to a "client" mocked as stdin
   add_file_descriptor(&state, fd_in);
@@ -110,9 +110,9 @@ Test(test_state, test_broadcast_want_1piece1client) {
   close(fd_in);
 
   // recover the written message
-  char *buffer = malloc(1024 * 1024);
+  char* buffer = malloc(1024 * 1024);
   size_t bytes_read = 0;
-  FILE *fd_read = fopen("/tmp/test_broadcast_want", "r");
+  FILE* fd_read = fopen("/tmp/test_broadcast_want", "r");
   while (1) {
     char ch = fgetc(fd_read);
     if (feof(fd_read)) {

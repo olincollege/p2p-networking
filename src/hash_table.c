@@ -1,6 +1,8 @@
 #include "./hash_table.h"
-#include "./hash.h"
+
 #include <string.h>
+
+#include "./hash.h"
 
 /* Internal, hash table with custom initial bucket size */
 static hash_table make_table__(size_t bucket_size) {
@@ -17,12 +19,12 @@ hash_table make_table(void) { return make_table__(1); }
 
 /* Returns a key/value pair in the hash_table or a NULL padded struct if it does
  * not exist */
-kv_pair *get_kv_pair(hash_table *in_table, void *key, size_t key_size) {
+kv_pair* get_kv_pair(hash_table* in_table, void* key, size_t key_size) {
   // find the bucket for the key
   size_t bucket = djb2_bytes(key, key_size) % in_table->bucket_size;
   // walk the bucket
   for (size_t index = 0; index < (in_table->buckets[bucket].size); index++) {
-    char *ret_key = in_table->buckets[bucket].arr[index].key;
+    char* ret_key = in_table->buckets[bucket].arr[index].key;
     size_t ret_key_size = in_table->buckets[bucket].arr[index].key_size;
     if (ret_key_size == key_size && memcmp(key, ret_key, key_size) == 0) {
       return &in_table->buckets[bucket].arr[index];
@@ -33,14 +35,14 @@ kv_pair *get_kv_pair(hash_table *in_table, void *key, size_t key_size) {
 
 /* Removes a key from the hash_table or does nothing is such key does not exist
  */
-void remove_kv_pair(hash_table *in_table, void *key, size_t key_size) {
+void remove_kv_pair(hash_table* in_table, void* key, size_t key_size) {
   // find the bucket for the key
   size_t bucket = djb2_bytes(key, key_size) % in_table->bucket_size;
   vector_kv_pair without_key = new_vec_kv_pair();
   // walk the bucket
   for (size_t index = 0; index < (in_table->buckets[bucket].size); index++) {
     kv_pair pair = in_table->buckets[bucket].arr[index];
-    char *ret_key = pair.key;
+    char* ret_key = pair.key;
     size_t ret_key_size = pair.key_size;
     if ((ret_key_size == key_size && memcmp(key, ret_key, key_size) == 0)) {
       // remove element
@@ -61,7 +63,7 @@ void remove_kv_pair(hash_table *in_table, void *key, size_t key_size) {
  * Note that the keys and values are pointers and may be invalidated with any
  * future hash_table operations.
  */
-vector_kv_pair collect_table(hash_table *in_table) {
+vector_kv_pair collect_table(hash_table* in_table) {
   vector_kv_pair collected = new_vec_kv_pair();
   // walk the buckets
   for (size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
@@ -74,7 +76,7 @@ vector_kv_pair collect_table(hash_table *in_table) {
 }
 
 /* Frees the data used by the hash table */
-void hash_dealloc(hash_table *in_table) {
+void hash_dealloc(hash_table* in_table) {
   for (size_t bucket = 0; bucket < in_table->bucket_size; bucket++) {
     for (size_t elem = 0; elem < in_table->buckets[bucket].size; elem++) {
       free(in_table->buckets[bucket].arr[elem].key);
@@ -87,8 +89,8 @@ void hash_dealloc(hash_table *in_table) {
 }
 
 /* Reallocs the hash table to handle more elements */
-void hash_realloc(hash_table *in_table) // NOLINT recursive resolve is fine here
-{
+void hash_realloc(  // NOLINT recursive resolve is fine here
+    hash_table* in_table) {
   // allocate a new table with double the bucket size
   hash_table new_table = make_table__(in_table->bucket_size * 2);
   // copy elements in
@@ -97,7 +99,7 @@ void hash_realloc(hash_table *in_table) // NOLINT recursive resolve is fine here
          element++) {
       kv_pair cur_pair = in_table->buckets[bucket].arr[element];
       set_value(&new_table, cur_pair.key, cur_pair.key_size, cur_pair.value,
-                cur_pair.value_size); // NOLINT
+                cur_pair.value_size);  // NOLINT
     }
   }
   // swap new table with input table
@@ -107,24 +109,25 @@ void hash_realloc(hash_table *in_table) // NOLINT recursive resolve is fine here
 }
 
 /* Updates the value of a key in a hash table */
-void set_value( // NOLINT recursive resolve is fine here
-    hash_table *in_table, void *key, size_t key_size, void *value,
+void set_value(  // NOLINT recursive resolve is fine here
+    hash_table* in_table, void* key, size_t key_size, void* value,
     size_t value_size) {
-  kv_pair *get_pair = get_kv_pair(in_table, key, key_size);
+  kv_pair* get_pair = get_kv_pair(in_table, key, key_size);
   if (get_pair) {
     free(get_pair->value);
     get_pair->value = malloc(value_size);
-    memcpy(get_pair->value, value, value_size); // NOLINT
+    memcpy(get_pair->value, value, value_size);  // NOLINT
   } else {
     if (in_table->num_elements == in_table->bucket_size) {
-      hash_realloc(in_table); // NOLINT
+      hash_realloc(in_table);  // NOLINT
     }
     in_table->num_elements++;
-    size_t bucket = djb2_bytes(key, key_size) % in_table->bucket_size; // NOLINT
+    size_t bucket =
+        djb2_bytes(key, key_size) % in_table->bucket_size;  // NOLINT
     kv_pair new_pair = {malloc(key_size), malloc(value_size), key_size,
                         value_size};
-    memcpy(new_pair.key, key, key_size);       // NOLINT
-    memcpy(new_pair.value, value, value_size); // NOLINT
+    memcpy(new_pair.key, key, key_size);        // NOLINT
+    memcpy(new_pair.value, value, value_size);  // NOLINT
     push_vec_kv_pair(&in_table->buckets[bucket], new_pair);
   }
 }
