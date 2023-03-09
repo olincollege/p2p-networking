@@ -10,6 +10,7 @@
 | GCC       | apt (ubuntu)  | Compiling Code  |
 | crypto    | ubuntu native | <openssl/sha.h> |
 | ssl       | ubuntu native | <openssl/sha.h> |
+| epoll     | linux native  | <sys/epoll.h>   |
 
 Install these packages on Ubuntu:
 
@@ -18,6 +19,9 @@ sudo apt install build-essential cmake libcriterion-dev
 ```
 
 ## Building and Running
+[demo.webm](https://github.com/olincollege/p2p-networking/blob/main/docs/demo.webm)
+ <video autoplay loop src="https://user-images.githubusercontent.com/52898838/224102314-a12183e4-7db3-43df-878d-dfbb4a6c4779.webm" controls="controls" muted="muted" playsinline="playsinline"></video>
+
 
 This project uses CMake as its build system. To build:
 
@@ -30,11 +34,27 @@ make
 
 The executable for the program is located in `build/src/loop`.
 
-To run, you must first start the bootstrap node with `loop -S`. The boostrap
+To run, you must first start the bootstrap node with `sudo loop -S`. The boostrap
 runs on the hard-coded port `8100` as defined in `src/network.h`.
 
 Once a boostrap node is running, you can create new clients by just running
-`loop`. These clients use a random available port.
+`sudo loop`. These clients use a random available port.
+
+Elevated permissions are needed for configuring the max socket buffer size as we decided to use kernal level buffering instead of rolling our own buffering implementation at the application level. We require at least 1Mib in buffering because our piece size is 1Mib and the default buffer limit on most ubuntu distributions is around ~200Kib which would pose an issue. See the following documentation on this: 
+
+https://man7.org/linux/man-pages/man7/socket.7.html
+```C
+       SO_RCVBUFFORCE (since Linux 2.6.14)
+              Using this socket option, a privileged (CAP_NET_ADMIN)
+              process can perform the same task as SO_RCVBUF, but the
+              rmem_max limit can be overridden.
+```
+```C
+       SO_SNDBUFFORCE (since Linux 2.6.14)
+              Using this socket option, a privileged (CAP_NET_ADMIN)
+              process can perform the same task as SO_SNDBUF, but the
+              wmem_max limit can be overridden.
+```
 
 ## Bootstrapping 
 In this project, we implemented a simplified model of peer exchange, often refered to as PEX (https://en.wikipedia.org/wiki/Peer_exchange). The concept is frequently used in datastructures such as distributed hash tables (DHT) which are integral to modern bittorrent protocols that try to avoid a centralized point of failure that a tracker may provide. 
