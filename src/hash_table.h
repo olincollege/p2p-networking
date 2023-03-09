@@ -70,7 +70,8 @@ vector_kv_pair collect_table(hash_table *in_table);
  *
  * @return An initialized, empty hash table object.
  */
-hash_table make_table();
+hash_table make_table(void);
+
 /* For internal use with make_table */
 static hash_table make_table__(size_t bucket_size);
 

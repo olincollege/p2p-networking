@@ -11,8 +11,9 @@ static hash_table make_table__(size_t bucket_size) {
   }
   return new_table;
 }
+
 /* Creates a new empty hash table */
-hash_table make_table() { return make_table__(1); }
+hash_table make_table(void) { return make_table__(1); }
 
 /* Returns a key/value pair in the hash_table or a NULL padded struct if it does
  * not exist */
