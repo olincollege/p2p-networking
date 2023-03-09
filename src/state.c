@@ -19,9 +19,8 @@ client_state new_state(void) {
   return new_state;
 }
 
-unsigned rand_no_lint() {
-  return (
-      unsigned)(rand()); // NOLINT(cert-msc30-c,cert-msc50-cpp,concurrency-mt-unsafe)
+static unsigned rand_no_lint(void) {
+  return (unsigned)(rand()); // NOLINT(cert-msc30-c,cert-msc50-cpp,concurrency-mt-unsafe)
 }
 
 client_state demo_state(const unsigned int max_peices,

@@ -18,6 +18,8 @@ typedef struct client_state {
   hash_table ports;
 } client_state;
 
+static unsigned rand_no_lint(void);
+
 /**
  * Initialize a new state instance.
  *
