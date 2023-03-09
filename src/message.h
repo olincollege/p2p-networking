@@ -52,7 +52,7 @@ enum {
   PEER_MESSAGE_TYPE = 2,
   // For the .message_size field
   ASK_MESSAGE_SIZE = (int)(sizeof(ask_message) - sizeof(uint32_t)),  // bytes
-  GIVE_MESSAGE_SIZE = (int)(sizeof(ask_message) - sizeof(uint32_t)), // bytes
+  GIVE_MESSAGE_SIZE = (int)(sizeof(give_message) - sizeof(uint32_t)), // bytes
   HASH_SIZE = 32,                                                    // bytes
 };
 
