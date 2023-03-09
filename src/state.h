@@ -30,9 +30,14 @@ client_state new_state(void);
 /**
  * Create a demo state with random have/want pieces
  *
+ * @param max_pieces Maximum number of unique pieces in the demo system.
+ * @param have_amount Number of pieces the demo client initially owns.
+ * @param want_amount Number of pieces the demo client initially wants.
  * @return A client_state object populated with random pieces.
  */
-client_state demo_state();
+client_state demo_state(const unsigned int max_pieces,
+                        const unsigned int have_amount,
+                        const unsigned int want_amount);
 
 /**
  * Deallocate client_state object.
