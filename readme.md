@@ -1,5 +1,16 @@
 # P2P Networking
 
+## Dependencies 
+
+| Package  | Source | Need |
+| ------------- | ------------- | ------------- |
+| Criterion  | apt (ubuntu) | Unit Tests  |
+| Make  | apt (ubuntu)   | Compiling Code |
+| CMake  | apt (ubuntu)   | Compiling Code |
+| GCC  | apt (ubuntu)   | Compiling Code |
+| crypto  | ubuntu native   | <openssl/sha.h> |
+| ssl  | ubuntu native   | <openssl/sha.h> |
+
 ## Bootstrapping 
 In this project, we implemented a simplified model of peer exchange, often refered to as PEX (https://en.wikipedia.org/wiki/Peer_exchange). The concept is frequently used in datastructures such as distributed hash tables (DHT) which are integral to modern bittorrent protocols that try to avoid a centralized point of failure that a tracker may provide. 
 
