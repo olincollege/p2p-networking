@@ -107,8 +107,8 @@ void send_if_have(client_state *state, ask_message message, int peer) {
   if (piece) {
     send_message.message_size = GIVE_MESSAGE_SIZE;
     send_message.type = GIVE_MESSAGE_TYPE;
-    memcpy(send_message.sha256, message.sha256,
-           sizeof(message.sha256));                             // NOLINT
+    memcpy(send_message.sha256, message.sha256, // NOLINT
+           sizeof(message.sha256));
     memcpy(send_message.piece, piece->value, PIECE_SIZE_BYTES); // NOLINT
     write(peer, &send_message, sizeof(send_message));
   }
