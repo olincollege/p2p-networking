@@ -1,6 +1,7 @@
 #include "./loop.h"
 
 #include <arpa/inet.h>
+#include <assert.h>
 #include <bits/getopt_core.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -9,7 +10,6 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <assert.h>
 
 #include "./message.h"
 #include "./network.h"
@@ -55,7 +55,6 @@ void loop(int epoll_c, struct epoll_event* events, client_state* state) {
     struct epoll_event epoll_e = events[i];
     int file_descriptor = as_custom_data(events[i].data.u64).fd;
     int event_type = as_custom_data(events[i].data.u64).type;
-
 
     if (epoll_e.events & EPOLLERR) {  // NOLINT expected usage
       puts("error on epoll event");
@@ -142,7 +141,7 @@ int main(int argc, char* argv[]) {
   printf("running I/O loop on port %d!\n", (int)server.port);
   size_t iter = 0;
   const size_t BROADCAST_TIMEOUT = 10;  // broadcast every 10sec
-  const unsigned int LOOP_TIMEOUT = 1000L *100L;
+  const unsigned int LOOP_TIMEOUT = 1000L * 100L;
   while (1) {
     iter++;
     if (!(iter % BROADCAST_TIMEOUT)) {
@@ -156,7 +155,8 @@ int main(int argc, char* argv[]) {
   }
 }
 
-void read_message(int file_descriptor, int epoll_fd, client_state* state) {
+void read_message(int file_descriptor, int epoll_fd,  // NOLINT
+                  client_state* state) {
   size_t message_len = full_message_availiable(file_descriptor);
 
   if (message_len) {
@@ -166,17 +166,17 @@ void read_message(int file_descriptor, int epoll_fd, client_state* state) {
     // Peek the message at the socket.
     ssize_t rec_bytes = recv(file_descriptor, message, message_len, 0);
     memcpy(&message_type, message + 4, 1);  // NOLINT
-    
-    assert((int)rec_bytes == (int)message_len); // NOLINT
+
+    assert((int)rec_bytes == (int)message_len);  // NOLINT
 
     // Ask message
     if (message_type == 0) {
-      assert((int)message_len == (int)sizeof(ask_message)); // NOLINT
+      assert((int)message_len == (int)sizeof(ask_message));  // NOLINT
       struct ask_message message_read;
       memcpy(&message_read, message, message_len);  // NOLINT
       send_if_have(state, message_read, file_descriptor);
     } else if (message_type == 1) {
-      assert((int)message_len == (int)sizeof(give_message)); // NOLINT
+      assert((int)message_len == (int)sizeof(give_message));  // NOLINT
       struct give_message message_read;
       memcpy(&message_read, message, message_len);  // NOLINT
       add_piece_have(state, &(message_read.piece), PIECE_SIZE_BYTES);

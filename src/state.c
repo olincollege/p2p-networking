@@ -1,12 +1,12 @@
 #include "./state.h"
 
 #include <arpa/inet.h>
+#include <assert.h>
 #include <openssl/sha.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <unistd.h>
 
 #include "./hash_table.h"
@@ -112,7 +112,7 @@ void send_if_have(client_state* state, ask_message message, int peer) {
            sizeof(message.sha256));
     memcpy(send_message.piece, piece->value, PIECE_SIZE_BYTES);  // NOLINT
     ssize_t written_bytes = write(peer, &send_message, sizeof(send_message));
-    assert(written_bytes == sizeof(send_message)); // NOLINT
+    assert(written_bytes == sizeof(send_message));  // NOLINT
   }
 }
 
@@ -156,7 +156,8 @@ void broadcast_want(client_state* state) {
   vector_kv_pair clients_connected = collect_table(&state->file_descriptors);
   vector_kv_pair pieces_wanted = collect_table(&state->pieces_want);
 
-  printf("current want %d pieces and have %d pieces total\n", (int)pieces_wanted.size, (int)state->pieces_have.num_elements);
+  printf("current want %d pieces and have %d pieces total\n",
+         (int)pieces_wanted.size, (int)state->pieces_have.num_elements);
 
   // Craft the ask message
   ask_message message;
