@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sys/epoll.h>
+
 #include "./message.h"
 #include "./state.h"
 
@@ -22,7 +24,7 @@ void on_connection(int epoll_c, int file_descriptor);
  * @param events An array of epoll events
  * @param state Global state of client
  */
-void loop(int epoll_c, struct epoll_event *events, client_state* state);
+void loop(int epoll_c, struct epoll_event* events, client_state* state);
 
 /**
  * Read a message from a client and update the state.
@@ -31,7 +33,7 @@ void loop(int epoll_c, struct epoll_event *events, client_state* state);
  * @param epoll_fd File descriptor of epoll container
  * @param state Global state of client
  */
-void read_message(int file_descriptor, int epoll_fd, client_state *state);
+void read_message(int file_descriptor, int epoll_fd, client_state* state);
 
 /**
  * Connect to a peer.
@@ -52,7 +54,8 @@ int connect_to_peer(peer_info peer, int epoll_c);
  * @param state Global state of client
  * @param epoll_c File descriptor of epoll container
  */
-void connect_to_list(peer_info *peer_list, size_t n, client_state *state, int epoll_c);
+void connect_to_list(peer_info* peer_list, size_t n, client_state* state,
+                     int epoll_c);
 
 /**
  * Bind a file descriptor to an epoll socket.
