@@ -1,15 +1,40 @@
 # P2P Networking
 
-## Dependencies 
+## Dependencies
 
-| Package  | Source | Need |
-| ------------- | ------------- | ------------- |
-| Criterion  | apt (ubuntu) | Unit Tests  |
-| Make  | apt (ubuntu)   | Compiling Code |
-| CMake  | apt (ubuntu)   | Compiling Code |
-| GCC  | apt (ubuntu)   | Compiling Code |
-| crypto  | ubuntu native   | <openssl/sha.h> |
-| ssl  | ubuntu native   | <openssl/sha.h> |
+| Package   | Source        | Need            |
+|-----------|---------------|-----------------|
+| Criterion | apt (ubuntu)  | Unit Tests      |
+| Make      | apt (ubuntu)  | Compiling Code  |
+| CMake     | apt (ubuntu)  | Compiling Code  |
+| GCC       | apt (ubuntu)  | Compiling Code  |
+| crypto    | ubuntu native | <openssl/sha.h> |
+| ssl       | ubuntu native | <openssl/sha.h> |
+
+Install these packages on Ubuntu:
+
+```
+sudo apt install build-essential cmake libcriterion-dev
+```
+
+## Building and Running
+
+This project uses CMake as its build system. To build:
+
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+
+The executable for the program is located in `build/src/loop`.
+
+To run, you must first start the bootstrap node with `loop -S`. The boostrap
+runs on the hard-coded port `8100` as defined in `src/network.h`.
+
+Once a boostrap node is running, you can create new clients by just running
+`loop`. These clients use a random available port.
 
 ## Bootstrapping 
 In this project, we implemented a simplified model of peer exchange, often refered to as PEX (https://en.wikipedia.org/wiki/Peer_exchange). The concept is frequently used in datastructures such as distributed hash tables (DHT) which are integral to modern bittorrent protocols that try to avoid a centralized point of failure that a tracker may provide. 
