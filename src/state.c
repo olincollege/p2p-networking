@@ -1,6 +1,7 @@
 #include "./state.h"
 
 #include <arpa/inet.h>
+#include <assert.h>
 #include <openssl/sha.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -110,7 +111,8 @@ void send_if_have(client_state* state, ask_message message, int peer) {
     memcpy(send_message.sha256, message.sha256,  // NOLINT
            sizeof(message.sha256));
     memcpy(send_message.piece, piece->value, PIECE_SIZE_BYTES);  // NOLINT
-    write(peer, &send_message, sizeof(send_message));
+    ssize_t written_bytes = write(peer, &send_message, sizeof(send_message));
+    assert(written_bytes == sizeof(send_message));  // NOLINT
   }
 }
 
@@ -137,13 +139,10 @@ void peer_exchange(client_state* state) {
   for (size_t peer = 0; peer < clients_connected.size; peer++) {
     int peer_fd = *(int*)clients_connected.arr[peer].key;
     ssize_t send_res = write(peer_fd, message, peer_message_size);
-    printf("starting to write to peer\n");
     if (send_res < 0) {
       printf("failed to write peer list, closing fd: %d\n, err: %d", peer_fd,
              (int)send_res);
       close(peer_fd);
-    } else {
-      printf("sent peer list to fd: %d\n", peer_fd);
     }
   }
 
@@ -156,6 +155,9 @@ void peer_exchange(client_state* state) {
 void broadcast_want(client_state* state) {
   vector_kv_pair clients_connected = collect_table(&state->file_descriptors);
   vector_kv_pair pieces_wanted = collect_table(&state->pieces_want);
+
+  printf("current want %d pieces and have %d pieces total\n",
+         (int)pieces_wanted.size, (int)state->pieces_have.num_elements);
 
   // Craft the ask message
   ask_message message;
@@ -171,14 +173,11 @@ void broadcast_want(client_state* state) {
     // Send the want message to each peer
     for (size_t peer = 0; peer < clients_connected.size; peer++) {
       int peer_fd = *(int*)clients_connected.arr[peer].key;
-      printf("starting to write to peer\n");
       ssize_t send_res = write(peer_fd, &message, sizeof(ask_message));
       if (send_res < 0) {
         printf("failed to write ask message, closing fd: %d\n, err: %d",
                peer_fd, (int)send_res);
         close(peer_fd);
-      } else {
-        printf("sent want piece message to fd: %d\n", peer_fd);
       }
     }
   }
