@@ -163,6 +163,8 @@ void read_message(int file_descriptor, int epoll_fd, client_state *state) {
     // Peek the message at the socket.
     recv(file_descriptor, message, (size_t) message_len, 0);
     memcpy(&message_type, message + 4, 1); // NOLINT
+     
+    printf("processing message of type %d\n", (int)message_type);
 
     // Ask message
     if (message_type == 0) {
@@ -216,7 +218,7 @@ void connect_to_list(peer_info *peer_list, size_t n, client_state *state,
                      int epoll_c) {
   for (size_t peer = 0; peer < n; peer++) {
     if (get_kv_pair(&(state->ports), &(peer_list->addr_port),
-                    sizeof(peer_info)) == NULL) {
+                    sizeof(peer_list->addr_port)) == NULL) {
       int new_connection = connect_to_peer(*peer_list, epoll_c);
       if (new_connection) {
         add_port(state, peer_list->addr_port);
