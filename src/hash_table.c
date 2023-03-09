@@ -3,7 +3,7 @@
 #include <string.h>
 
 /* Internal, hash table with custom initial bucket size */
-hash_table make_table__(size_t bucket_size) {
+static hash_table make_table__(size_t bucket_size) {
   hash_table new_table = {malloc(sizeof(vector_kv_pair) * bucket_size),
                           bucket_size, 0};
   for (size_t vec = 0; vec < bucket_size; vec++) {
