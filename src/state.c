@@ -101,10 +101,14 @@ void remove_port(client_state *state, uint16_t port) {
 }
 
 void send_if_have(client_state *state, ask_message message, int peer) {
-    kv_pair* piece = get_kv_pair(&state->pieces_have, message.sha256, sizeof(message.sha256)); 
-    if(piece) {
-        write(peer, piece->value, PIECE_SIZE_BYTES);
-    }
+  kv_pair* piece = get_kv_pair(&state->pieces_have, message.sha256, sizeof(message.sha256));  give_message send_message;
+  if(piece) {
+    send_message.message_size = GIVE_MESSAGE_SIZE;
+    send_message.type = GIVE_MESSAGE_TYPE;
+    memcpy(send_message.sha256, message.sha256, sizeof(message.sha256)); //NOLINT
+    memcpy(send_message.piece, piece->value, PIECE_SIZE_BYTES); //NOLINT
+    write(peer, &send_message, sizeof(send_message));
+  }
 }
 
 void peer_exchange(client_state *state) {
