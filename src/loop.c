@@ -9,6 +9,7 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include "./message.h"
 #include "./network.h"
@@ -35,6 +36,7 @@ void on_connection(int epoll_c, int file_descriptor) {
       puts("error accepting connections");
       break;
     }
+    large_buffer_socket(accept_res);
     if (bind_epoll(epoll_c, accept_res) < 0) {
       puts("failed to bind new connection to epoll container");
     }
@@ -54,7 +56,6 @@ void loop(int epoll_c, struct epoll_event* events, client_state* state) {
     int file_descriptor = as_custom_data(events[i].data.u64).fd;
     int event_type = as_custom_data(events[i].data.u64).type;
 
-    printf("processing, fd: %d, et: %d \n", file_descriptor, event_type);
 
     if (epoll_e.events & EPOLLERR) {  // NOLINT expected usage
       puts("error on epoll event");
@@ -79,9 +80,9 @@ void loop(int epoll_c, struct epoll_event* events, client_state* state) {
 
 int main(int argc, char* argv[]) {
   /* Initialize a demo state by randomly choosing have/want pieces */
-  const unsigned int SEED_MAX_PEICES = 100;
-  const unsigned int SEED_HAVE_AMOUNT = 30;
-  const unsigned int SEED_WANT_AMOUNT = 30;
+  const unsigned int SEED_MAX_PEICES = 75;
+  const unsigned int SEED_HAVE_AMOUNT = 60;
+  const unsigned int SEED_WANT_AMOUNT = 20;
   client_state state =
       demo_state(SEED_MAX_PEICES, SEED_HAVE_AMOUNT, SEED_WANT_AMOUNT);
 
@@ -141,6 +142,7 @@ int main(int argc, char* argv[]) {
   printf("running I/O loop on port %d!\n", (int)server.port);
   size_t iter = 0;
   const size_t BROADCAST_TIMEOUT = 10;  // broadcast every 10sec
+  const unsigned int LOOP_TIMEOUT = 1000L *100L;
   while (1) {
     iter++;
     if (!(iter % BROADCAST_TIMEOUT)) {
@@ -150,6 +152,7 @@ int main(int argc, char* argv[]) {
       peer_exchange(&state);
     }
     loop(epoll_c, events, &state);
+    usleep(LOOP_TIMEOUT);
   }
 }
 
@@ -161,17 +164,19 @@ void read_message(int file_descriptor, int epoll_fd, client_state* state) {
     uint8_t message_type = 0;
     // https://pubs.opengroup.org/onlinepubs/007904975/functions/recv.html
     // Peek the message at the socket.
-    recv(file_descriptor, message, message_len, 0);
+    ssize_t rec_bytes = recv(file_descriptor, message, message_len, 0);
     memcpy(&message_type, message + 4, 1);  // NOLINT
-
-    printf("processing message of type %d\n", (int)message_type);
+    
+    assert((int)rec_bytes == (int)message_len); // NOLINT
 
     // Ask message
     if (message_type == 0) {
+      assert((int)message_len == (int)sizeof(ask_message)); // NOLINT
       struct ask_message message_read;
       memcpy(&message_read, message, message_len);  // NOLINT
       send_if_have(state, message_read, file_descriptor);
     } else if (message_type == 1) {
+      assert((int)message_len == (int)sizeof(give_message)); // NOLINT
       struct give_message message_read;
       memcpy(&message_read, message, message_len);  // NOLINT
       add_piece_have(state, &(message_read.piece), PIECE_SIZE_BYTES);
@@ -198,6 +203,7 @@ int connect_to_peer(peer_info peer, int epoll_c) {
   in_address.sin6_addr = peer.sin6_addr;          // IP to connect to.
 
   int to_connect = socket(AF_INET6, SOCK_STREAM, 0);  // Create socket
+  large_buffer_socket(to_connect);
 
   // Try connecting
   if (connect(to_connect, (const struct sockaddr*)&in_address,
@@ -235,7 +241,7 @@ int bind_epoll(int epoll_c, int file_descriptor) {
   non_blocking_socket(file_descriptor);
   struct epoll_event client_connection;
   client_connection.data.u64 = as_epoll_data(file_descriptor, EPOLL_PEER_FD);
-  client_connection.events = EPOLLIN | EPOLLET;
+  client_connection.events = EPOLLIN;
 
   // bind connection to epoll
   int epoll_bind =
